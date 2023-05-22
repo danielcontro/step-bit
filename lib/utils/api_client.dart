@@ -1,47 +1,38 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import '../models/steps.dart';
 
 class ApiClient {
   static const String baseUrl = 'https://impact.dei.unipd.it/bwthw/';
+  static const String patientUsername = 'Jpefaq6m58';
   static String pingEndpoint = 'gate/v1/ping/';
   static String tokenEndpoint = 'gate/v1/token/';
   static String refreshEndpoint = 'gate/v1/refresh/';
 
-  static String? _accessToken;
-  static String? _refreshToken;
-
   static Future<String?> getAccessToken() async {
-    if (_accessToken == null) {
-      final prefs = await SharedPreferences.getInstance();
-      _accessToken = prefs.getString('access_token');
-    }
-    return _accessToken;
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('access_token');
   }
 
   static Future<String?> getRefreshToken() async {
-    if (_refreshToken == null) {
-      final prefs = await SharedPreferences.getInstance();
-      _refreshToken = prefs.getString('refresh_token');
-    }
-    return _refreshToken;
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('refresh_token');
   }
 
-  static Future<void> _saveTokens(
-      String accessToken, String refreshToken) async {
+  static Future<void> _saveTokens(String jsonBody) async {
+    final decodedResponse = jsonDecode(jsonBody);
     final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('access_token', accessToken);
-    await prefs.setString('refresh_token', refreshToken);
-    _accessToken = accessToken;
-    _refreshToken = refreshToken;
+    await prefs.setString('access_token', decodedResponse['access']);
+    await prefs.setString('refresh_token', decodedResponse['refresh']);
   }
 
   static Future<void> _clearTokens() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('access_token');
     await prefs.remove('refresh_token');
-    _accessToken = null;
-    _refreshToken = null;
   }
 
   static Future<http.Response> _sendRequest(http.Request request) async {
@@ -50,9 +41,13 @@ class ApiClient {
     if (response.statusCode == 401) {
       final isTokenRefreshed = await _refreshAccessToken();
       if (isTokenRefreshed) {
-        // retry the request with the new access token
-        request.headers['Authorization'] = 'Bearer $_accessToken';
-        return _sendRequest(request);
+        var newRequest = http.Request(request.method, request.url);
+        newRequest.headers.addAll(request.headers);
+        newRequest.headers['Authorization'] =
+            'Bearer ${await getAccessToken()}';
+        //newRequest.body = request.body;
+        //newRequest.bodyFields = request.bodyFields;
+        return _sendRequest(newRequest);
       }
     }
     return http.Response(responseString, response.statusCode);
@@ -64,16 +59,13 @@ class ApiClient {
       return false;
     }
     final response = await http.post(
-      Uri.parse('$baseUrl/$tokenEndpoint'),
+      Uri.parse('$baseUrl/$refreshEndpoint'),
       body: {
-        'refresh_token': refreshToken,
+        'refresh': refreshToken,
       },
     );
     if (response.statusCode == 200) {
-      final jsonResponse = json.decode(response.body);
-      final accessToken = jsonResponse['access_token'];
-      final newRefreshToken = jsonResponse['refresh_token'];
-      await _saveTokens(accessToken, newRefreshToken);
+      await _saveTokens(response.body);
       return true;
     } else {
       await _clearTokens();
@@ -81,33 +73,43 @@ class ApiClient {
     }
   }
 
-  /*static Future<http.Response> get(String path,
-      {Map<String, String> headers}) async {
-    final request = http.Request('GET', Uri.parse('$BASE_URL/$path'));
-    request.headers.addAll(headers ?? {});
-    request.headers['Authorization'] = 'Bearer ${await getAccessToken()}';
-    return _sendRequest(request);
-  }*/
-
-  /*static Future<http.Response> post(String path,
-      {Map<String, String> headers, dynamic body}) async {
-    final request = http.Request('POST', Uri.parse('$BASE_URL/$path'));
-    request.headers.addAll(headers ?? {});
-    request.headers['Authorization'] = 'Bearer ${await getAccessToken()}';
-    request.body = json.encode(body ?? {});
-    return _sendRequest(request);
-  }*/
-
   static Future<bool> login(String username, String password) async {
     final body = {'username': username, 'password': password};
     final response =
         await http.post(Uri.parse('$baseUrl/$tokenEndpoint'), body: body);
 
     if (response.statusCode == 200) {
-      final decodedResponse = jsonDecode(response.body);
-      _saveTokens(decodedResponse['access'], decodedResponse['refresh']);
+      _saveTokens(response.body);
       return true;
     }
     return false;
+  }
+
+  static Future<http.Response> _get(String path,
+      {required Map<String, String> headers}) async {
+    final request = http.Request('GET', Uri.parse('$baseUrl/$path'));
+    request.headers.addAll(headers);
+    request.headers['Authorization'] = 'Bearer ${await getAccessToken()}';
+    return _sendRequest(request);
+  }
+
+  static Future<List<Steps>?> getSteps(DateTime date) async {
+    var newFormat = DateFormat("y-MM-dd");
+    String day = newFormat.format(date);
+
+    final response = await _get(
+        "data/v1/steps/patients/$patientUsername/day/$day/",
+        headers: {});
+    if (response.statusCode != 200) {
+      return null;
+    }
+    List<Steps> result;
+    final decodedResponse = jsonDecode(response.body);
+    result = [];
+    for (var i = 0; i < decodedResponse['data']['data'].length; i++) {
+      result.add(Steps.fromJson(
+          decodedResponse['data']['date'], decodedResponse['data']['data'][i]));
+    }
+    return result;
   }
 }
