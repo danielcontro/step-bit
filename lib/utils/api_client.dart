@@ -85,31 +85,25 @@ class ApiClient {
     return false;
   }
 
-  static Future<http.Response> _get(String path,
-      {required Map<String, String> headers}) async {
+  static Future<http.Response> _get(String path) async {
     final request = http.Request('GET', Uri.parse('$baseUrl/$path'));
-    request.headers.addAll(headers);
     request.headers['Authorization'] = 'Bearer ${await getAccessToken()}';
     return _sendRequest(request);
   }
 
   static Future<List<Steps>?> getSteps(DateTime date) async {
     var newFormat = DateFormat("y-MM-dd");
-    String day = newFormat.format(date);
+    String dateFormatted = newFormat.format(date);
 
     final response = await _get(
-        "data/v1/steps/patients/$patientUsername/day/$day/",
-        headers: {});
+        "data/v1/steps/patients/$patientUsername/day/$dateFormatted/");
     if (response.statusCode != 200) {
       return null;
     }
-    List<Steps> result;
-    final decodedResponse = jsonDecode(response.body);
-    result = [];
-    for (var i = 0; i < decodedResponse['data']['data'].length; i++) {
-      result.add(Steps.fromJson(
-          decodedResponse['data']['date'], decodedResponse['data']['data'][i]));
-    }
-    return result;
+    final decodedResponse = jsonDecode(response.body)['data']['data'];
+    final parsedJson = decodedResponse.cast<Map<String, dynamic>>();
+    return parsedJson
+        .map<Steps>((json) => Steps.fromJson(dateFormatted, json))
+        .toList();
   }
 }

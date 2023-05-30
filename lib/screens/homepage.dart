@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:stepbit/utils/api_client.dart';
 
-import '../models/steps.dart';
-
 class HomePage extends StatelessWidget {
   const HomePage({Key? key}) : super(key: key);
 
@@ -28,9 +26,11 @@ class HomePage extends StatelessWidget {
                 result?.forEach((element) => print(element));
                 final message =
                     result == null ? 'Request failed' : 'Request successful';
-                ScaffoldMessenger.of(context)
-                  ..removeCurrentSnackBar()
-                  ..showSnackBar(SnackBar(content: Text(message)));
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context)
+                    ..removeCurrentSnackBar()
+                    ..showSnackBar(SnackBar(content: Text(message)));
+                }
               },
               child: const Text('Get the data')),
         ],
