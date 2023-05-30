@@ -54,16 +54,17 @@ class Login extends StatelessWidget {
                     if (_formKey.currentState!.validate()) {
                       final result =
                           await ApiClient.login(_username!, _password!);
-                      if (result) {
-                        // HOMEPAGE
+                      if (result && context.mounted) {
                         Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => HomePage()));
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Invalid credential')),
-                        );
+                                builder: (context) => const HomePage()));
+                      } else if (context.mounted) {
+                        ScaffoldMessenger.of(context)
+                          ..removeCurrentSnackBar()
+                          ..showSnackBar(
+                            const SnackBar(content: Text('Invalid credential')),
+                          );
                       }
                     }
                   }),
