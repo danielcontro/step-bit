@@ -1,28 +1,22 @@
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class TokenManager {
   static const _accessToken = 'access_token';
   static const _refreshToken = 'refresh_token';
 
-  static Future<String?> getAccessToken() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString(_accessToken);
-  }
+  static const storage = FlutterSecureStorage();
 
-  static Future<String?> getRefreshToken() async {
-    final prefs = await SharedPreferences.getInstance();
-    return prefs.getString(_refreshToken);
-  }
+  static Future<String?> getAccessToken() => storage.read(key: _accessToken);
+
+  static Future<String?> getRefreshToken() => storage.read(key: _refreshToken);
 
   static Future<void> saveTokens(Map<String, dynamic> json) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString(_accessToken, json['access']);
-    await prefs.setString(_refreshToken, json['refresh']);
+    await storage.write(key: _accessToken, value: json['access']);
+    await storage.write(key: _refreshToken, value: json['refresh']);
   }
 
   static Future<void> clearTokens() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove(_accessToken);
-    await prefs.remove(_refreshToken);
+    await storage.delete(key: _accessToken);
+    await storage.delete(key: _refreshToken);
   }
 }

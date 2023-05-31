@@ -30,8 +30,10 @@ class AppInterceptor {
             if (value.statusCode == HttpStatus.ok) {
               await TokenManager.saveTokens(value.data);
               final accessToken = await TokenManager.getAccessToken();
-              err.requestOptions.headers['Authorization'] =
-                  'Bearer $accessToken';
+              if (accessToken != null) {
+                err.requestOptions.headers['Authorization'] =
+                    'Bearer $accessToken';
+              }
 
               final opts = Options(
                   method: err.requestOptions.method,
