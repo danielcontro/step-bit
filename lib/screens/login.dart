@@ -3,26 +3,31 @@ import 'package:stepbit/screens/homepage.dart';
 
 import '../utils/api_client.dart';
 
-class Login extends StatelessWidget {
-  final _formKey = GlobalKey<FormState>();
+class Login extends StatefulWidget {
+  const Login({Key? key}) : super(key: key);
+
+  @override
+  State<StatefulWidget> createState() => LoginState();
+}
+
+class LoginState extends State<Login> {
+  final formKey = GlobalKey<FormState>();
   String? _username;
   String? _password;
-
-  Login({Key? key}) : super(key: key);
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Login"),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
+        appBar: AppBar(
+          title: const Text("StepBit"),
+        ),
+        body: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Form(
+            key: formKey,
+            child:
+                Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+              const Text("Login",
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
               TextFormField(
                 decoration: const InputDecoration(
                     labelText: 'Username', icon: Icon(Icons.person)),
@@ -51,27 +56,34 @@ class Login extends StatelessWidget {
               ElevatedButton(
                   child: const Text('Login'),
                   onPressed: () async {
-                    if (_formKey.currentState!.validate()) {
-                      final result =
-                          await ApiClient.login(_username!, _password!);
-                      if (result && context.mounted) {
-                        Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const HomePage()));
-                      } else if (context.mounted) {
-                        ScaffoldMessenger.of(context)
-                          ..removeCurrentSnackBar()
-                          ..showSnackBar(
-                            const SnackBar(content: Text('Invalid credential')),
-                          );
-                      }
+                    if (formKey.currentState!.validate()) {
+                      formKey.currentState!.save();
+                      await login(context, _username!, _password!);
                     }
-                  }),
-            ],
+                  })
+            ]),
           ),
-        ),
-      ),
-    );
+        ));
+  }
+
+  Future<void> login(
+    BuildContext context,
+    String username,
+    String password,
+  ) async {
+    if (username.isEmpty || password.isEmpty) {
+      return;
+    }
+    final result = await ApiClient.login(username, password);
+    if (result && context.mounted) {
+      Navigator.pushReplacement(
+          context, MaterialPageRoute(builder: (context) => const HomePage()));
+    } else if (context.mounted) {
+      ScaffoldMessenger.of(context)
+        ..removeCurrentSnackBar()
+        ..showSnackBar(
+          const SnackBar(content: Text('Invalid credential')),
+        );
+    }
   }
 }

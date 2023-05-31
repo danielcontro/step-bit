@@ -20,39 +20,42 @@ class AppInterceptor {
       handler.next(options);
     }, onError: (err, handler) async {
       if (err.response?.statusCode == HttpStatus.unauthorized) {
-        try {
-          final refreshToken = await TokenManager.getRefreshToken();
-          if (refreshToken == null) {
-            return;
-          }
-          await dio.post(_refreshEndpoint,
-              data: {'refresh': refreshToken}).then((value) async {
-            if (value.statusCode == HttpStatus.ok) {
-              await TokenManager.saveTokens(value.data);
-              final accessToken = await TokenManager.getAccessToken();
-              if (accessToken != null) {
-                err.requestOptions.headers['Authorization'] =
-                    'Bearer $accessToken';
-              }
+        final success = await refreshToken();
+        if (!success) return;
 
-              final opts = Options(
-                  method: err.requestOptions.method,
-                  headers: err.requestOptions.headers);
-              final reqOpts = err.requestOptions;
-              final cloneReq = await dio.request(err.requestOptions.path,
-                  options: opts,
-                  data: reqOpts.data,
-                  queryParameters: reqOpts.queryParameters,
-                  cancelToken: reqOpts.cancelToken,
-                  onReceiveProgress: reqOpts.onReceiveProgress,
-                  onSendProgress: reqOpts.onSendProgress);
-              return handler.resolve(cloneReq);
-            }
-          });
-        } catch (e) {
-          print(e);
+        final accessToken = await TokenManager.getAccessToken();
+        if (accessToken != null) {
+          err.requestOptions.headers['Authorization'] = 'Bearer $accessToken';
         }
+
+        final opts = Options(
+            method: err.requestOptions.method,
+            headers: err.requestOptions.headers);
+        final reqOpts = err.requestOptions;
+        final cloneReq = await dio.request(err.requestOptions.path,
+            options: opts,
+            data: reqOpts.data,
+            queryParameters: reqOpts.queryParameters,
+            cancelToken: reqOpts.cancelToken,
+            onReceiveProgress: reqOpts.onReceiveProgress,
+            onSendProgress: reqOpts.onSendProgress);
+        return handler.resolve(cloneReq);
       }
     }));
+  }
+
+  Future<bool> refreshToken() async {
+    final refreshToken = await TokenManager.getRefreshToken();
+    if (refreshToken == null) {
+      return false;
+    }
+    return await dio.post(_refreshEndpoint,
+        data: {'refresh': refreshToken}).then((value) async {
+      if (value.statusCode == HttpStatus.ok) {
+        await TokenManager.saveTokens(value.data);
+        return true;
+      }
+      return false;
+    });
   }
 }

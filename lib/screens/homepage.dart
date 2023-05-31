@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:stepbit/utils/api_client.dart';
 
 class HomePage extends StatelessWidget {
@@ -6,20 +7,26 @@ class HomePage extends StatelessWidget {
 
   static const routename = 'HomePage';
 
+  Widget userGreeting(String name) {
+    return Text(
+      "Ciao $name!",
+      style: const TextStyle(
+        fontWeight: FontWeight.bold,
+        fontSize: 30,
+      ),
+    ).animate().fade(duration: 500.ms).slideX(curve: Curves.easeIn);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text(HomePage.routename),
       ),
-      body: Center(
-          child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+      body: Column(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          const Text("You are logged in"),
-          const SizedBox(
-            height: 10,
-          ),
+          userGreeting("Luca"),
           ElevatedButton(
               onPressed: () async {
                 final result = await ApiClient.getSteps(DateTime(2023, 4, 4));
@@ -34,7 +41,7 @@ class HomePage extends StatelessWidget {
               },
               child: const Text('Get the data')),
         ],
-      )),
+      ),
     );
   }
 }
