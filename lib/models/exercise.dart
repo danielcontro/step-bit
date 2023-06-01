@@ -29,10 +29,10 @@ class Exercise {
         distanceUnit: json["distanceUnit"],
         duration: json["duration"] == 0
             ? 0.0
-            : double.parse(json["duration"].toString()),
+            : double.parse(json["duration"].toString())/1000,
         activeDuration: json["activeDuration"] == 0
             ? 0.0
-            : double.parse(json["activeDuration"].toString()),
+            : double.parse(json["activeDuration"].toString())/1000,
         steps: json["steps"],
         logType: json["logType"],
         heartRateZones: json["heartRateZones"] != null
