@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:stepbit/utils/app_interceptor.dart';
 import 'package:stepbit/utils/token_manager.dart';
 
+import '../models/exercise.dart';
 import '../models/steps.dart';
 
 class ApiClient {
@@ -37,6 +38,24 @@ class ApiClient {
       return data
           .cast<Map<String, dynamic>>()
           .map<Steps>((json) => Steps.fromJson(dateFormatted, json))
+          .toList();
+    });
+ }
+
+ static Future<List<Exercise>?> getExercises(DateTime date) {
+    var newFormat = DateFormat('y-MM-dd');
+    final dateFormatted = newFormat.format(date);
+
+    return _client
+        .get('data/v1/exercise/patients/$_patientUsername/day/$dateFormatted/')
+        .then((value) {
+      if (value.statusCode != HttpStatus.ok) {
+        return null;
+      }
+      final data = value.data['data']['data'];
+      return data
+          .cast<Map<String, dynamic>>()
+          .map<Exercise>((json) => Exercise.fromJson(dateFormatted, json))
           .toList();
     });
   }

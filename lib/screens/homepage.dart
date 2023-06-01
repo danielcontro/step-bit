@@ -40,6 +40,22 @@ class HomePage extends StatelessWidget {
                 }
               },
               child: const Text('Get the data')),
+              const SizedBox(
+            height: 10,
+          ),
+          ElevatedButton(
+              onPressed: () async {
+                final result = await ApiClient.getExercises(DateTime(2023, 5, 25));
+                result?.forEach((element) => print(element));
+                final message =
+                    result == null ? 'Request failed' : 'Request successful';
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context)
+                    ..removeCurrentSnackBar()
+                    ..showSnackBar(SnackBar(content: Text(message)));
+                }
+              },
+              child: const Text('Get the data')),
         ],
       ),
     );
