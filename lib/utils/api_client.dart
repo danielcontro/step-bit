@@ -8,7 +8,6 @@ import '../models/steps.dart';
 
 class ApiClient {
   static const _patientUsername = 'Jpefaq6m58';
-  static const _pingEndpoint = 'gate/v1/ping/';
   static const _tokenEndpoint = 'gate/v1/token/';
 
   static final _client = AppInterceptor().dio;
