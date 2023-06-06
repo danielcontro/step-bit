@@ -1,86 +1,59 @@
-import 'package:animated_digit/animated_digit.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
-import 'package:stepbit/utils/api_client.dart';
-import 'package:stepbit/utils/extension_methods.dart';
+import 'package:stepbit/screens/start_activity.dart';
 
-import '../models/steps.dart';
-
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
 
-  Widget userGreeting(String name) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text("Hello $name!",
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 30,
-            )),
-        Padding(
-          padding: const EdgeInsets.fromLTRB(0, 5, 0, 0),
-          child: yesterdaySteps(),
-        ),
-      ],
-    ).animate().fade(duration: 500.ms).slideX(curve: Curves.easeIn);
-  }
+  @override
+  State<StatefulWidget> createState() => HomePageState();
+}
 
-  Widget yesterdaySteps() {
-    return FutureBuilder(
-        future: ApiClient.getSteps(
-            DateTime.now().subtract(const Duration(days: 1))),
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            final steps = snapshot.data as List<Steps>;
-            final dailySteps = steps.map((e) => e.value).sum();
-            return AnimatedDigitWidget(
-              value: dailySteps,
-              textStyle: const TextStyle(
-                fontWeight: FontWeight.normal,
-                fontSize: 17,
-                color: Colors.grey,
-              ),
-              prefix: "You walked ",
-              suffix: " steps yesterday",
-            );
-          } else {
-            return const Text("");
-          }
-        });
+class HomePageState extends State<HomePage> {
+  int _selectedIndex = 1;
+  static const TextStyle optionStyle =
+      TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
+  static const List<Widget> _widgetOptions = <Widget>[
+    Text(
+      'Favorites',
+      style: optionStyle,
+    ),
+    StartActivity(),
+    Text(
+      'Maps',
+      style: optionStyle,
+    ),
+  ];
+
+  void _onItemTapped(int index) {
+    setState(() => _selectedIndex = index);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('HomePage'),
+        title: const Text('StepBit'),
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Padding(
-              padding: const EdgeInsets.fromLTRB(5, 5, 0, 0),
-              child: userGreeting("Luca")),
-          const SizedBox(
-            height: 10,
+      bottomNavigationBar: BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.favorite),
+            label: 'Favorites',
           ),
-          ElevatedButton(
-              onPressed: () async {
-                final result =
-                    await ApiClient.getExercises(DateTime(2023, 5, 25));
-                result?.forEach((element) => debugPrint(element.toString()));
-                final message =
-                    result == null ? 'Request failed' : 'Request successful';
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context)
-                    ..removeCurrentSnackBar()
-                    ..showSnackBar(SnackBar(content: Text(message)));
-                }
-              },
-              child: const Text('Get the Exercise data')),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.map),
+            label: 'Maps',
+          ),
         ],
+        currentIndex: _selectedIndex,
+        selectedItemColor: Colors.blue,
+        onTap: _onItemTapped,
       ),
+      body: _widgetOptions.elementAt(_selectedIndex),
     );
   }
 }
