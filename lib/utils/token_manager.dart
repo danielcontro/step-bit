@@ -22,7 +22,7 @@ class TokenManager {
     await _storage.delete(key: _refreshToken);
   }
 
-  static Future<bool> isTokenExpired() async {
+  static Future<bool> isAccessTokenExpired() async {
     final accessToken = await getAccessToken();
     if (accessToken == null) {
       return true;
@@ -30,7 +30,20 @@ class TokenManager {
     final isExpired = JwtDecoder.isExpired(accessToken);
     if (!isExpired) {
       final seconds = JwtDecoder.getRemainingTime(accessToken).inSeconds;
-      print("The token is still valid for $seconds seconds");
+      print("The access token is still valid for $seconds seconds");
+    }
+    return isExpired;
+  }
+
+  static Future<bool> isRefreshTokenExpired() async {
+    final refreshToken = await getRefreshToken();
+    if (refreshToken == null) {
+      return true;
+    }
+    final isExpired = JwtDecoder.isExpired(refreshToken);
+    if (!isExpired) {
+      final seconds = JwtDecoder.getRemainingTime(refreshToken).inSeconds;
+      print("The refresh token is still valid for $seconds seconds");
     }
     return isExpired;
   }

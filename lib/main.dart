@@ -35,7 +35,7 @@ class MyApp extends StatelessWidget {
   }
 
   Future<bool> showLoginPage() async {
-    final isTokenExpired = await TokenManager.isTokenExpired();
+    final isTokenExpired = await TokenManager.isAccessTokenExpired();
     if (!isTokenExpired) {
       return false;
     }

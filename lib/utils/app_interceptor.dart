@@ -46,7 +46,8 @@ class AppInterceptor {
 
   Future<bool> refreshToken() async {
     final refreshToken = await TokenManager.getRefreshToken();
-    if (refreshToken == null) {
+    final isTokenExpired = await TokenManager.isRefreshTokenExpired();
+    if (refreshToken == null || isTokenExpired) {
       return false;
     }
     return await dio.post(_refreshEndpoint,

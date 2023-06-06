@@ -1,14 +1,13 @@
+import 'package:animated_digit/animated_digit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:stepbit/utils/api_client.dart';
-import 'package:stepbit/utils/extension_methods/sum_iterable.dart';
+import 'package:stepbit/utils/extension_methods.dart';
 
 import '../models/steps.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({Key? key}) : super(key: key);
-
-  static const routename = 'HomePage';
 
   Widget userGreeting(String name) {
     return Column(
@@ -19,7 +18,10 @@ class HomePage extends StatelessWidget {
               fontWeight: FontWeight.bold,
               fontSize: 30,
             )),
-        yesterdaySteps()
+        Padding(
+          padding: const EdgeInsets.fromLTRB(0, 5, 0, 0),
+          child: yesterdaySteps(),
+        ),
       ],
     ).animate().fade(duration: 500.ms).slideX(curve: Curves.easeIn);
   }
@@ -32,14 +34,16 @@ class HomePage extends StatelessWidget {
           if (snapshot.hasData) {
             final steps = snapshot.data as List<Steps>;
             final dailySteps = steps.map((e) => e.value).sum();
-            return Text(
-              "You walked $dailySteps steps yesterday🚀",
-              style: const TextStyle(
+            return AnimatedDigitWidget(
+              value: dailySteps,
+              textStyle: const TextStyle(
                 fontWeight: FontWeight.normal,
                 fontSize: 17,
                 color: Colors.grey,
               ),
-            ).animate().fade(duration: 500.ms).slideX(curve: Curves.easeIn);
+              prefix: "You walked ",
+              suffix: " steps yesterday",
+            );
           } else {
             return const Text("");
           }
@@ -50,12 +54,14 @@ class HomePage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text(HomePage.routename),
+        title: const Text('HomePage'),
       ),
       body: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          userGreeting("Luca"),
+          Padding(
+              padding: const EdgeInsets.fromLTRB(5, 5, 0, 0),
+              child: userGreeting("Luca")),
           const SizedBox(
             height: 10,
           ),
@@ -63,7 +69,7 @@ class HomePage extends StatelessWidget {
               onPressed: () async {
                 final result =
                     await ApiClient.getExercises(DateTime(2023, 5, 25));
-                result?.forEach((element) => print(element));
+                result?.forEach((element) => debugPrint(element.toString()));
                 final message =
                     result == null ? 'Request failed' : 'Request successful';
                 if (context.mounted) {
