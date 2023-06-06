@@ -9,10 +9,12 @@ class HomePage extends StatefulWidget {
 }
 
 class HomePageState extends State<HomePage> {
-  int _selectedIndex = 1;
+  int selectedIndex = 1;
+  final pageViewController = PageController(initialPage: 1);
+
   static const TextStyle optionStyle =
       TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
-  static const List<Widget> _widgetOptions = <Widget>[
+  static const List<Widget> screens = <Widget>[
     Text(
       'Favorites',
       style: optionStyle,
@@ -24,15 +26,17 @@ class HomePageState extends State<HomePage> {
     ),
   ];
 
-  void _onItemTapped(int index) {
-    setState(() => _selectedIndex = index);
+  @override
+  void dispose() {
+    pageViewController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('StepBit'),
+        title: const Text('StepBit', style: TextStyle(fontSize: 30)),
       ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
@@ -49,11 +53,17 @@ class HomePageState extends State<HomePage> {
             label: 'Maps',
           ),
         ],
-        currentIndex: _selectedIndex,
+        currentIndex: selectedIndex,
         selectedItemColor: Colors.blue,
-        onTap: _onItemTapped,
+        onTap: (index) => pageViewController.animateToPage(index,
+            duration: const Duration(milliseconds: 200),
+            curve: Curves.bounceOut),
       ),
-      body: _widgetOptions.elementAt(_selectedIndex),
+      body: PageView(
+        controller: pageViewController,
+        children: screens,
+        onPageChanged: (index) => setState(() => selectedIndex = index),
+      ),
     );
   }
 }

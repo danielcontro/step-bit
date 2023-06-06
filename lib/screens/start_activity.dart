@@ -23,7 +23,7 @@ class StartActivity extends StatelessWidget {
           child: yesterdaySteps(),
         ),
       ],
-    ).animate().fade(duration: 500.ms).slideX(curve: Curves.easeIn);
+    ).animate().fade(duration: 500.ms).slideY(curve: Curves.bounceOut);
   }
 
   Widget yesterdaySteps() {
@@ -53,6 +53,7 @@ class StartActivity extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Padding(
