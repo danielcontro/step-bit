@@ -5,6 +5,8 @@ import 'package:stepbit/utils/app_colors.dart';
 import 'package:stepbit/utils/app_interceptor.dart';
 import 'package:stepbit/utils/token_manager.dart';
 
+import 'widgets/loading.dart';
+
 void main() {
   runApp(const MyApp());
 }
@@ -47,27 +49,5 @@ class MyApp extends StatelessWidget {
     }
     final credentialStillValid = await AppInterceptor().refreshToken();
     return !credentialStillValid;
-  }
-}
-
-class Loading extends StatelessWidget {
-  const Loading({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return const Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text("Loading",
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 20,
-              )),
-          SizedBox(height: 32),
-          CircularProgressIndicator(),
-        ],
-      ),
-    );
   }
 }

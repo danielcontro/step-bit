@@ -5,7 +5,12 @@ class HeartRateZones {
   final int minutes;
   final double caloriesOut;
 
-  const HeartRateZones({required this.name, required this.min, required this.max, required this.minutes, required this.caloriesOut});
+  const HeartRateZones(
+      {required this.name,
+      required this.min,
+      required this.max,
+      required this.minutes,
+      required this.caloriesOut});
 
   factory HeartRateZones.fromJson(Map<String, dynamic> json) {
     return HeartRateZones(
@@ -13,8 +18,7 @@ class HeartRateZones {
         min: json["min"],
         max: json["max"],
         minutes: json["minutes"],
-        caloriesOut: double.parse(json["caloriesOut"].toString())
-      );
+        caloriesOut: double.parse(json["caloriesOut"].toString()));
   }
 
   @override

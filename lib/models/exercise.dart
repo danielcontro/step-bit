@@ -3,22 +3,36 @@ import 'package:intl/intl.dart';
 import 'heart_rate_zones.dart';
 
 class Exercise {
-    final String activityName;
-    final int averageHeartRate;
-    final int calories;
-    final double? distance;
-    final String? distanceUnit;
-    final double duration;
-    final double activeDuration;
-    final int? steps;
-    final String logType;
-    final List<HeartRateZones> heartRateZones;
-    final double? speed;
-    final double? vO2Max;
-    final double elevationGain;
-    final DateTime time;
+  final String activityName;
+  final int averageHeartRate;
+  final int calories;
+  final double? distance;
+  final String? distanceUnit;
+  final double duration;
+  final double activeDuration;
+  final int? steps;
+  final String logType;
+  final List<HeartRateZones> heartRateZones;
+  final double? speed;
+  final double? vO2Max;
+  final double elevationGain;
+  final DateTime time;
 
-  const Exercise({required  this.activityName, required  this.averageHeartRate, required this.calories, required this.distance, required this.distanceUnit, required this.duration, required this.activeDuration, required this.steps, required this.logType, required this.heartRateZones, required this.speed, required this.vO2Max, required this.elevationGain, required this.time});
+  const Exercise(
+      {required this.activityName,
+      required this.averageHeartRate,
+      required this.calories,
+      required this.distance,
+      required this.distanceUnit,
+      required this.duration,
+      required this.activeDuration,
+      required this.steps,
+      required this.logType,
+      required this.heartRateZones,
+      required this.speed,
+      required this.vO2Max,
+      required this.elevationGain,
+      required this.time});
 
   factory Exercise.fromJson(String date, Map<String, dynamic> json) {
     return Exercise(
@@ -26,19 +40,19 @@ class Exercise {
         averageHeartRate: json["averageHeartRate"],
         calories: json["calories"],
         distance: double.tryParse(json["distance"].toString()),
-        distanceUnit: json["distanceUnit"] != null
-            ? 'km'
-            : null,
+        distanceUnit: json["distanceUnit"] != null ? 'km' : null,
         duration: json["duration"] == 0
             ? 0.0
-            : double.parse(json["duration"].toString())/1000,
+            : double.parse(json["duration"].toString()) / 1000,
         activeDuration: json["activeDuration"] == 0
             ? 0.0
-            : double.parse(json["activeDuration"].toString())/1000,
+            : double.parse(json["activeDuration"].toString()) / 1000,
         steps: json["steps"],
         logType: json["logType"],
         heartRateZones: json["heartRateZones"] != null
-            ? json["heartRateZones"].map<HeartRateZones>((json) => HeartRateZones.fromJson(json)).toList()
+            ? json["heartRateZones"]
+                .map<HeartRateZones>((json) => HeartRateZones.fromJson(json))
+                .toList()
             : List.empty(),
         speed: double.tryParse(json["speed"].toString()),
         vO2Max: double.tryParse(["VO2Max"].toString()),

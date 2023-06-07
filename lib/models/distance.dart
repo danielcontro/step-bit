@@ -9,7 +9,7 @@ class Distance {
   factory Distance.fromJson(String date, Map<String, dynamic> json) {
     return Distance(
         time: DateFormat('yyyy-MM-dd HH:mm:ss').parse('$date ${json["time"]}'),
-        value: double.parse(json["value"])/100);
+        value: double.parse(json["value"]) / 100);
   }
 
   @override
