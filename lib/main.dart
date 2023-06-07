@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:stepbit/screens/homepage.dart';
 import 'package:stepbit/screens/login.dart';
+import 'package:stepbit/utils/app_colors.dart';
 import 'package:stepbit/utils/app_interceptor.dart';
 import 'package:stepbit/utils/token_manager.dart';
 
@@ -16,6 +17,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      theme: ThemeData(
+          primarySwatch: Colors.lime,
+          brightness: AppColors.theme,
+          primaryColor: AppColors.primaryColor,
+          appBarTheme: AppBarTheme(color: AppColors.primaryColor)),
       home: FutureBuilder(
           future: showLoginPage(),
           builder: (context, snapshot) {

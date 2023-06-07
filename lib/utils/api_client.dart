@@ -40,9 +40,9 @@ class ApiClient {
           .map<Steps>((json) => Steps.fromJson(dateFormatted, json))
           .toList();
     });
- }
+  }
 
- static Future<List<Distance>?> getDistance(DateTime date) {
+  static Future<List<Distance>?> getDistance(DateTime date) {
     var newFormat = DateFormat('y-MM-dd');
     final dateFormatted = newFormat.format(date);
 
@@ -58,9 +58,9 @@ class ApiClient {
           .map<Distance>((json) => Distance.fromJson(dateFormatted, json))
           .toList();
     });
- }
+  }
 
- static Future<List<Exercise>?> getExercises(DateTime date) {
+  static Future<List<Exercise>?> getExercises(DateTime date) {
     var newFormat = DateFormat('y-MM-dd');
     final dateFormatted = newFormat.format(date);
 
@@ -75,6 +75,33 @@ class ApiClient {
           .cast<Map<String, dynamic>>()
           .map<Exercise>((json) => Exercise.fromJson(dateFormatted, json))
           .toList();
+    });
+  }
+
+  static Future<List<Exercise>?> getExercisesStartEnd(
+      DateTime startDate, DateTime endDate) {
+    var newFormat = DateFormat('y-MM-dd');
+    final startDateFormatted = newFormat.format(startDate);
+    final endDateFormatted = newFormat.format(endDate);
+
+    return _client
+        .get(
+            'data/v1/exercise/patients/$_patientUsername/daterange/start_date/$startDateFormatted/end_date/$endDateFormatted/')
+        .then((value) {
+      if (value.statusCode != HttpStatus.ok) {
+        return null;
+      }
+      final data = value.data['data'] as List<dynamic>;
+      List<Exercise> results = [];
+      for (var exercise in data) {
+        var date = exercise['date'];
+        var exerciseDay = exercise['data']
+            .cast<Map<String, dynamic>>()
+            .map<Exercise>((json) => Exercise.fromJson(date, json))
+            .toList();
+        results.addAll(exerciseDay);
+      }
+      return results.reversed.toList();
     });
   }
 }

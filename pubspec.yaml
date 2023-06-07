@@ -16,6 +16,7 @@ dependencies:
   jwt_decoder: ^2.0.1
   flutter_animate: ^4.1.1+1
   animated_digit: ^3.2.1
+  activity_ring: ^0.3.0
 
 dev_dependencies:
   flutter_test:

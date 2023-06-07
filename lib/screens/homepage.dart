@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:stepbit/screens/start_activity.dart';
+import 'package:stepbit/utils/app_colors.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -54,7 +55,7 @@ class HomePageState extends State<HomePage> {
           ),
         ],
         currentIndex: selectedIndex,
-        selectedItemColor: Colors.blue,
+        selectedItemColor: AppColors.primaryColor,
         onTap: (index) => pageViewController.animateToPage(index,
             duration: const Duration(milliseconds: 200),
             curve: Curves.bounceOut),
