@@ -12,12 +12,12 @@ import '../utils/api_client.dart';
 class StartActivity extends StatelessWidget {
   const StartActivity({Key? key}) : super(key: key);
 
-  Widget userGreeting(String name) {
-    return Column(
+  Widget stepsTopBar() {
+    return const Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        UserGreeting(name: name),
-        const Padding(
+        UserGreeting(name: "Luca"),
+        Padding(
           padding: EdgeInsets.fromLTRB(0, 5, 0, 0),
           child: YesterdaySteps(),
         ),
@@ -28,11 +28,12 @@ class StartActivity extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
-          margin: const EdgeInsets.fromLTRB(5, 20, 0, 0),
+          margin: const EdgeInsets.fromLTRB(5, 20, 5, 0),
           width: double.infinity,
-          height: 80,
+          height: 85,
           decoration: BoxDecoration(
             color: AppColors.boxDecorationColor.withOpacity(0.7),
             borderRadius: const BorderRadius.all(Radius.circular(10)),
@@ -45,10 +46,40 @@ class StartActivity extends StatelessWidget {
               ),
             ],
           ),
-          child: userGreeting("Luca"),
+          child: stepsTopBar(),
         ),
         const SizedBox(
           height: 50,
+        ),
+        Center(
+          child: ElevatedButton(
+            // Bottone per iniziare una nuovo allenamento
+            onPressed: () {},
+            style: ButtonStyle(
+              shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                  RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(18.0),
+              )),
+            ),
+            child: const Text(
+              'START',
+              style: TextStyle(
+                fontSize: 25,
+                fontWeight: FontWeight.bold,
+                fontStyle: FontStyle.italic,
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(
+          height: 50,
+        ),
+        const Text(
+          "Your last activites",
+          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+        ),
+        const SizedBox(
+          height: 10,
         ),
         FutureBuilder(
           future: ApiClient.getExercisesStartEnd(
@@ -74,22 +105,7 @@ class StartActivity extends StatelessWidget {
               return const Loading();
             }
           },
-        ),
-        /*ElevatedButton(
-            onPressed: () async {
-              final result = await ApiClient.getExercisesStartEnd(
-                  DateTime(2023, 5, 21), DateTime(2023, 05, 28));
-              print(result);
-              result?.forEach((element) => debugPrint(element.toString()));
-              final message =
-                  result == null ? 'Request failed' : 'Request successful';
-              if (context.mounted) {
-                ScaffoldMessenger.of(context)
-                  ..removeCurrentSnackBar()
-                  ..showSnackBar(SnackBar(content: Text(message)));
-              }
-            },
-            child: const Text('Get the Exercise data')),*/
+        )
       ],
     );
   }

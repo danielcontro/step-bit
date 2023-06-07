@@ -33,7 +33,7 @@ class YesterdaySteps extends StatelessWidget {
                   suffix: " steps yesterday",
                 ),
                 const SizedBox(
-                  width: 70,
+                  width: 60,
                 ),
                 StepRing(steps: dailySteps)
               ],

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 
 import '../models/exercise.dart';
 
@@ -26,8 +25,7 @@ class ActivityCard extends StatelessWidget {
 
     return ListTile(
       leading: getActivityIcon(),
-      title: Text(
-          '${exercise.activityName} - ${exercise.convertToLocal()}'), // metodo per stampare la data meglio.
+      title: Text('${exercise.activityName} - ${exercise.convertToLocal()}'),
       subtitle: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -39,7 +37,7 @@ class ActivityCard extends StatelessWidget {
             const Icon(Icons.favorite, size: 15),
             Text(' ${exercise.averageHeartRate} bpm'),
           ]),
-          if (exercise.distance != null)
+          if (exercise.distance != null && exercise.distanceUnit != null)
             Row(children: [
               const Icon(Icons.timeline, size: 15),
               Text(
