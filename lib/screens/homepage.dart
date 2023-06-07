@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:stepbit/screens/map.dart';
 import 'package:stepbit/screens/start_activity.dart';
 import 'package:stepbit/utils/app_colors.dart';
 
@@ -21,10 +22,7 @@ class HomePageState extends State<HomePage> {
       style: optionStyle,
     ),
     StartActivity(),
-    Text(
-      'Maps',
-      style: optionStyle,
-    ),
+    MapWidget(),
   ];
 
   @override
