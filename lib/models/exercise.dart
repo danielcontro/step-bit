@@ -47,7 +47,7 @@ class Exercise {
   }
 
   String convertToLocal() {
-    return DateFormat('dd-MM-yyyy').format(time);
+    return DateFormat('dd/MM/yy HH:mm').format(time);
   }
 
   @override
