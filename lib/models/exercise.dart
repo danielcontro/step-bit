@@ -26,7 +26,9 @@ class Exercise {
         averageHeartRate: json["averageHeartRate"],
         calories: json["calories"],
         distance: double.tryParse(json["distance"].toString()),
-        distanceUnit: json["distanceUnit"],
+        distanceUnit: json["distanceUnit"] != null
+            ? 'km'
+            : null,
         duration: json["duration"] == 0
             ? 0.0
             : double.parse(json["duration"].toString())/1000,
@@ -42,6 +44,10 @@ class Exercise {
         vO2Max: double.tryParse(["VO2Max"].toString()),
         elevationGain: double.parse(json["elevationGain"].toString()),
         time: DateFormat('yyyy-MM-dd HH:mm:ss').parse('$date ${json["time"]}'));
+  }
+
+  String convertToLocal() {
+    return DateFormat('dd-MM-yyyy').format(time);
   }
 
   @override
