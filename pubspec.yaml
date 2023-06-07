@@ -17,6 +17,7 @@ dependencies:
   flutter_animate: ^4.1.1+1
   animated_digit: ^3.2.1
   activity_ring: ^0.3.0
+  dio_cache_interceptor: ^3.4.2
 
 dev_dependencies:
   flutter_test:
