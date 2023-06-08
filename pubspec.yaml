@@ -18,6 +18,9 @@ dependencies:
   animated_digit: ^3.2.1
   activity_ring: ^0.3.0
   dio_cache_interceptor: ^3.4.2
+  google_maps_flutter: ^2.3.0
+  uuid: ^3.0.7
+  geolocator: ^9.0.2
 
 dev_dependencies:
   flutter_test:

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:stepbit/screens/favorites.dart';
 import 'package:stepbit/screens/maps.dart';
+import 'package:stepbit/screens/map.dart';
 import 'package:stepbit/screens/start_activity.dart';
 import 'package:stepbit/utils/app_colors.dart';
 
@@ -14,6 +15,17 @@ class HomePage extends StatefulWidget {
 class HomePageState extends State<HomePage> {
   int selectedIndex = 1;
   final pageController = PageController(initialPage: 1);
+
+  static const TextStyle optionStyle =
+      TextStyle(fontSize: 30, fontWeight: FontWeight.bold);
+  static const List<Widget> screens = <Widget>[
+    Text(
+      'Favorites',
+      style: optionStyle,
+    ),
+    StartActivity(),
+    MapWidget(),
+  ];
 
   @override
   void dispose() {
