@@ -56,16 +56,12 @@ class HomePageState extends State<HomePage> {
       body: PageView(
         controller: pageController,
         children: [
-          const Favorites(),
+          Favorites(data: data),
           StartActivity(
               pageController: pageController,
               mapCallback: onDataChange,
               data: data),
-          MapWidget(data: data, callback: onDataChange)
-          /*Maps(
-            data: data,
-            callback: onDataChange,
-          )*/
+          MapWidget(data: data)
         ],
         onPageChanged: (index) => setState(() => selectedIndex = index),
       ),

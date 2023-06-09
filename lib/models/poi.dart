@@ -4,25 +4,44 @@ building = [church, university, chapel, ]
 historic = [building, ]
 amenity = [place_of_worship, restaurant, fast_food, cafe, bar, pub, food_court, ice_cream, marketplace]
 */
+import 'dart:math';
+
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+
 class POI {
   //final POIType type;
   final double latitude;
   final double longitude;
+  final double distanceInKm;
   final Map<String, dynamic> tags;
 
-  const POI({
-    //required this.type,
-    required this.latitude,
-    required this.longitude,
-    required this.tags,
-  });
+  const POI(
+      {
+      //required this.type,
+      required this.latitude,
+      required this.longitude,
+      required this.tags,
+      required this.distanceInKm});
 
-  factory POI.fromJson(Map<String, dynamic> json) {
+  factory POI.fromJson(Map<String, dynamic> json, LatLng position) {
     return POI(
         //type: POIType.node,
         latitude: json['lat'],
         longitude: json['lon'],
-        tags: json['tags']);
+        tags: json['tags'],
+        distanceInKm: getDistanceInKm(
+            json['lat'], json['lon'], position.latitude, position.longitude));
+  }
+
+  static double getDistanceInKm(
+      double lat1, double lon1, double lat2, double lon2) {
+    // return distance in km
+    var p = 0.017453292519943295;
+    var a = 0.5 -
+        cos((lat2 - lat1) * p) / 2 +
+        cos(lat1 * p) * cos(lat2 * p) * (1 - cos((lon2 - lon1) * p)) / 2;
+    final distance = 12742 * asin(sqrt(a));
+    return double.parse(distance.toStringAsFixed(3));
   }
 
   String getName() => tags['name'];
@@ -51,6 +70,13 @@ class POI {
     } else {
       return 'undefined';
     }
+  }
+
+  String getDistanceKmOrMeters() {
+    if (distanceInKm < 1) {
+      return '${(distanceInKm * 1000).round()} m';
+    }
+    return '$distanceInKm km';
   }
 
   @override

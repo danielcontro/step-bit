@@ -6,14 +6,12 @@ import 'package:stepbit/utils/position.dart';
 import 'package:uuid/uuid.dart';
 
 class MapWidget extends StatefulWidget {
-  const MapWidget({Key? key, required this.data, required this.callback})
-      : super(key: key);
+  final double data;
+
+  const MapWidget({Key? key, required this.data}) : super(key: key);
 
   @override
   State<MapWidget> createState() => _MapState();
-
-  final double data;
-  final Function callback;
 }
 
 class _MapState extends State<MapWidget> {

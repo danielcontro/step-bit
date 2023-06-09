@@ -6,17 +6,27 @@ import 'package:stepbit/widgets/loading.dart';
 import 'package:stepbit/widgets/poi_card.dart';
 
 class Favorites extends StatelessWidget {
-  const Favorites({Key? key}) : super(key: key);
+  late final double data;
 
-  Future<List<POI>> buildQuery() async {
+  Favorites({Key? key, required data}) : super(key: key) {
+    this.data = data * 500;
+  }
+
+  Future<List<POI>> buildQuery(double distance) async {
     final currentPosition = await getCurrentPosition();
     if (currentPosition != null) {
-      return OverpassApi.query(
-          Map.from({
-            'tourism': 'museum',
-          }),
-          currentPosition,
-          1000);
+      return OverpassApi.query([
+        ('tourism', 'attraction'),
+        ('tourism', 'viewpoint'),
+        ('tourism', 'museum'),
+        ('tourism', 'gallery'),
+        ('building', 'church'),
+        ('building', 'chapel'),
+        ('historic', 'building'),
+        ('amenity', 'restaurant'),
+        ('amenity', 'bar'),
+        ('amenity', 'ice_cream'),
+      ], currentPosition, distance);
     }
     return Future.error('Unable to fetch location');
   }
@@ -29,21 +39,18 @@ class Favorites extends StatelessWidget {
         style: TextStyle(fontSize: 40, fontWeight: FontWeight.bold),
       ),
       FutureBuilder(
-          future: buildQuery(),
+          future: buildQuery(data),
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               List<POI> poi = snapshot.data!;
-              //poi?.forEach((element) => print(element));
               return Expanded(
-                child: ListView.separated(
+                child: ListView.builder(
                   scrollDirection: Axis.vertical,
                   shrinkWrap: true,
+                  //prototypeItem: PoiCard(poi: poi.first),
                   itemCount: poi.length,
-                  separatorBuilder: (context, index) => const Divider(),
                   itemBuilder: (context, index) {
-                    return PoiCard(
-                      poi: poi[index],
-                    );
+                    return PoiCard(poi: poi[index]);
                   },
                 ),
               );
