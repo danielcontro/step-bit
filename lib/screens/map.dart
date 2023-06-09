@@ -12,7 +12,7 @@ class MapWidget extends StatefulWidget {
   @override
   State<MapWidget> createState() => _MapState();
 
-  final int data;
+  final double data;
   final Function callback;
 }
 
@@ -31,46 +31,8 @@ class _MapState extends State<MapWidget> {
 
   @override
   Widget build(BuildContext context) {
-    /*return Text('Maps ${widget.data}',
+    /*return Text('Maps ${(widget.data * 500).round()}',
         style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold));*/
-    /*return ListView(
-      scrollDirection: Axis.vertical,
-      shrinkWrap: true,
-      padding: const EdgeInsets.all(8.0),
-      children: <Widget>[
-        Text(
-          'Maps ${widget.data}',
-          style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
-        ),
-        FutureBuilder<LatLng>(
-            future: getCurrentPosition(),
-            builder: (context, snapshot) {
-              if (!snapshot.hasData) {
-                // while data is loading:
-                return const Center(
-                  child: CircularProgressIndicator(),
-                );
-              } else {
-                // data loaded:
-                final position = snapshot.data;
-                if (position == null) {
-                  return const Text("Error retrieving please retry!");
-                }
-                return GoogleMap(
-                  myLocationButtonEnabled: true,
-                  myLocationEnabled: true,
-                  mapType: MapType.normal,
-                  initialCameraPosition:
-                      CameraPosition(target: position, zoom: 15),
-                  onMapCreated: (GoogleMapController controller) {
-                    _controller.complete(controller);
-                  },
-                  markers: _markers.values.toSet(),
-                );
-              }
-            }),
-      ],
-    );*/
     return FutureBuilder<LatLng>(
         future: getCurrentPosition(),
         builder: (context, snapshot) {

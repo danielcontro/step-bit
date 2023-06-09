@@ -3,12 +3,12 @@ import 'package:flutter/material.dart';
 import '../utils/app_colors.dart';
 
 class QuantityInput extends StatefulWidget {
-  final int initialValue;
-  final int min;
-  final int max;
-  final int step;
+  final double initialValue;
+  final double min;
+  final double max;
+  final double step;
 
-  final void Function(int val) onChanged;
+  final void Function(double val) onChanged;
 
   const QuantityInput(
       {super.key,
@@ -23,7 +23,7 @@ class QuantityInput extends StatefulWidget {
 }
 
 class _QuantityInput extends State<QuantityInput> {
-  int _currentValue = 0;
+  double _currentValue = 0;
 
   @override
   void initState() {
@@ -37,11 +37,15 @@ class _QuantityInput extends State<QuantityInput> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          "Set diameter in km",
-          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+          "How much do you want to walk?",
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             IconButton(
                 iconSize: 50,
@@ -58,7 +62,7 @@ class _QuantityInput extends State<QuantityInput> {
                   color: AppColors.primaryColor,
                 )),
             Text(
-              _currentValue.toString(),
+              '${_currentValue.round()} km',
               style: const TextStyle(fontSize: 30),
             ),
             IconButton(

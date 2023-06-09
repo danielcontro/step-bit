@@ -8,11 +8,11 @@ class ActivityCard extends StatelessWidget {
   const ActivityCard({super.key, required this.exercise});
 
   Icon getActivityIcon() {
-    if (exercise.activityName.toLowerCase() == "corsa") {
+    if (exercise.activityName.toLowerCase() == "running") {
       return const Icon(Icons.directions_run);
-    } else if (exercise.activityName.toLowerCase() == "camminata") {
+    } else if (exercise.activityName.toLowerCase() == "walking") {
       return const Icon(Icons.directions_walk);
-    } else if (exercise.activityName.toLowerCase() == "bici") {
+    } else if (exercise.activityName.toLowerCase() == "cycling") {
       return const Icon(Icons.pedal_bike);
     } else {
       return const Icon(Icons.question_mark);

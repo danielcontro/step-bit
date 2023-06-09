@@ -21,8 +21,8 @@ class HomePageState extends State<HomePage> {
     super.dispose();
   }
 
-  int data = 1;
-  void onDataChange(int newData) {
+  double data = 1;
+  void onDataChange(double newData) {
     setState(() => data = newData);
   }
 

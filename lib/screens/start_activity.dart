@@ -12,8 +12,8 @@ import '../widgets/loading.dart';
 
 class StartActivity extends StatelessWidget {
   final PageController pageController;
-  final Function(int) mapCallback;
-  int data;
+  final Function(double) mapCallback;
+  double data;
 
   StartActivity(
       {Key? key,
@@ -22,7 +22,7 @@ class StartActivity extends StatelessWidget {
       required this.data})
       : super(key: key);
 
-  _changeprice(int num) {
+  _changeprice(double num) {
     data = num;
   }
 
