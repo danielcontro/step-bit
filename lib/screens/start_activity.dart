@@ -1,10 +1,9 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:stepbit/models/exercise.dart';
 import 'package:stepbit/utils/app_colors.dart';
 import 'package:stepbit/widgets/activity_card.dart';
+import 'package:stepbit/widgets/quantity_input.dart';
 import 'package:stepbit/widgets/user_greeting.dart';
 import 'package:stepbit/widgets/yesterday_steps.dart';
 
@@ -13,11 +12,19 @@ import '../widgets/loading.dart';
 
 class StartActivity extends StatelessWidget {
   final PageController pageController;
-  final Function(int) mapCallback;
+  final Function(double) mapCallback;
+  double data;
 
-  const StartActivity(
-      {Key? key, required this.pageController, required this.mapCallback})
+  StartActivity(
+      {Key? key,
+      required this.pageController,
+      required this.mapCallback,
+      required this.data})
       : super(key: key);
+
+  _changeprice(double num) {
+    data = num;
+  }
 
   Widget stepsTopBar() {
     return const Padding(
@@ -87,7 +94,17 @@ class StartActivity extends StatelessWidget {
           height: 50,
         ),
         Center(
-          child: ElevatedButton(
+          child: QuantityInput(
+            initialValue: data,
+            max: 20,
+            min: 1,
+            step: 1,
+            onChanged: (value) {
+              _changeprice(value);
+              mapCallback(value);
+            },
+          ),
+          /*ElevatedButton(
             // Bottone per iniziare una nuovo allenamento
             onPressed: () {
               mapCallback(Random().nextInt(10));
@@ -109,7 +126,7 @@ class StartActivity extends StatelessWidget {
                 fontStyle: FontStyle.italic,
               ),
             ),
-          ),
+          ),*/
         ),
         const SizedBox(
           height: 50,

@@ -36,7 +36,12 @@ class Exercise {
 
   factory Exercise.fromJson(String date, Map<String, dynamic> json) {
     return Exercise(
-        activityName: json["activityName"],
+        activityName: switch (json["activityName"]) {
+          "Corsa" => "Running",
+          "Bici" => "Cycling",
+          "Camminata" => "Walking",
+          _ => json["activityName"],
+        },
         averageHeartRate: json["averageHeartRate"],
         calories: json["calories"],
         distance: double.tryParse(json["distance"].toString()),

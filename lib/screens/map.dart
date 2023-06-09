@@ -6,10 +6,14 @@ import 'package:stepbit/utils/position.dart';
 import 'package:uuid/uuid.dart';
 
 class MapWidget extends StatefulWidget {
-  const MapWidget({Key? key}) : super(key: key);
+  const MapWidget({Key? key, required this.data, required this.callback})
+      : super(key: key);
 
   @override
   State<MapWidget> createState() => _MapState();
+
+  final double data;
+  final Function callback;
 }
 
 class _MapState extends State<MapWidget> {
@@ -27,6 +31,8 @@ class _MapState extends State<MapWidget> {
 
   @override
   Widget build(BuildContext context) {
+    /*return Text('Maps ${(widget.data * 500).round()}',
+        style: TextStyle(fontSize: 30, fontWeight: FontWeight.bold));*/
     return FutureBuilder<LatLng>(
         future: getCurrentPosition(),
         builder: (context, snapshot) {
