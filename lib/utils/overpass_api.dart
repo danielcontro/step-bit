@@ -1,15 +1,30 @@
 import 'dart:io';
 import 'package:dio/dio.dart';
+import 'package:dio_cache_interceptor/dio_cache_interceptor.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../models/poi.dart';
 
 class OverpassApi {
-  static const String _endpoint = "https://overpass-api.de/api/interpreter/";
-  static final dio = Dio(BaseOptions(baseUrl: _endpoint));
+  static const String _baseUrl = "https://overpass-api.de/api/interpreter/";
+  var dio = Dio();
   static const int _timeout = 10;
 
-  static Future<List<POI>> query(
+  OverpassApi() {
+    dio.options = BaseOptions(baseUrl: _baseUrl);
+    dio.interceptors.add(DioCacheInterceptor(
+        options: CacheOptions(
+            store: MemCacheStore(),
+            policy: CachePolicy.request,
+            hitCacheOnErrorExcept: [401, 403],
+            maxStale: const Duration(days: 7),
+            priority: CachePriority.normal,
+            cipher: null,
+            keyBuilder: CacheOptions.defaultCacheKeyBuilder,
+            allowPostMethod: true)));
+  }
+
+  Future<List<POI>> query(
       List<(String, String)> tags, LatLng position, double distance) {
     final tagsFormatted = tags
         .map((e) =>
@@ -24,6 +39,7 @@ class OverpassApi {
       if (value.statusCode != HttpStatus.ok) {
         return Future.error("Error performing query");
       }
+      print(value.headers);
       final List data = value.data['elements'];
       final res = data
           .map((e) => POI.fromJson(e, position))

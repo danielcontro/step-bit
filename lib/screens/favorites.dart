@@ -15,7 +15,7 @@ class Favorites extends StatelessWidget {
   Future<List<POI>> buildQuery(double distance) async {
     final currentPosition = await getCurrentPosition();
     if (currentPosition != null) {
-      return OverpassApi.query([
+      return OverpassApi().query([
         ('tourism', 'attraction'),
         ('tourism', 'viewpoint'),
         ('tourism', 'museum'),
