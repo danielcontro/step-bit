@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:stepbit/screens/homepage.dart';
 import 'package:stepbit/screens/login.dart';
 import 'package:stepbit/utils/app_colors.dart';
@@ -8,7 +9,15 @@ import 'package:stepbit/utils/token_manager.dart';
 import 'widgets/loading.dart';
 
 void main() {
-  runApp(const MyApp());
+  // We need to call it manually,
+  // because we going to call setPreferredOrientations()
+  // before the runApp() call
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Than we setup preferred orientations,
+  // and only after it finished we run our app
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
+      .then((_) => runApp(const MyApp()));
 }
 
 class MyApp extends StatelessWidget {
