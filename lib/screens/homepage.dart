@@ -21,7 +21,7 @@ class HomePageState extends State<HomePage> {
     super.dispose();
   }
 
-  int data = 0;
+  int data = 1;
   void onDataChange(int newData) {
     setState(() => data = newData);
   }
@@ -58,8 +58,10 @@ class HomePageState extends State<HomePage> {
         children: [
           const Favorites(),
           StartActivity(
-              pageController: pageController, mapCallback: onDataChange),
-          const MapWidget()
+              pageController: pageController,
+              mapCallback: onDataChange,
+              data: data),
+          MapWidget(data: data, callback: onDataChange)
           /*Maps(
             data: data,
             callback: onDataChange,

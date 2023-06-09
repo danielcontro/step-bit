@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:stepbit/models/exercise.dart';
@@ -15,15 +13,17 @@ import '../widgets/loading.dart';
 class StartActivity extends StatelessWidget {
   final PageController pageController;
   final Function(int) mapCallback;
+  int data;
 
   StartActivity(
-      {Key? key, required this.pageController, required this.mapCallback})
+      {Key? key,
+      required this.pageController,
+      required this.mapCallback,
+      required this.data})
       : super(key: key);
 
-  int selectedValue = 1;
-
   _changeprice(int num) {
-    selectedValue = num;
+    data = num;
   }
 
   Widget stepsTopBar() {
@@ -95,12 +95,13 @@ class StartActivity extends StatelessWidget {
         ),
         Center(
           child: QuantityInput(
-            initialValue: selectedValue,
+            initialValue: data,
             max: 20,
             min: 1,
             step: 1,
             onChanged: (value) {
               _changeprice(value);
+              mapCallback(value);
             },
           ),
           /*ElevatedButton(

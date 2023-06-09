@@ -33,11 +33,9 @@ class _QuantityInput extends State<QuantityInput> {
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      scrollDirection: Axis.vertical,
-      shrinkWrap: true,
-      padding: const EdgeInsets.all(8),
-      children: <Widget>[
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
         const Text(
           "Set diameter in km",
           style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
@@ -46,6 +44,7 @@ class _QuantityInput extends State<QuantityInput> {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             IconButton(
+                iconSize: 50,
                 onPressed: () {
                   setState(() {
                     if (_currentValue > widget.min) {
@@ -63,6 +62,7 @@ class _QuantityInput extends State<QuantityInput> {
               style: const TextStyle(fontSize: 30),
             ),
             IconButton(
+                iconSize: 50,
                 onPressed: () {
                   setState(() {
                     if (_currentValue < widget.max) {
