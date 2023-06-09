@@ -43,17 +43,19 @@ class Favorites extends StatelessWidget {
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               List<POI> poi = snapshot.data!;
-              return Expanded(
-                child: ListView.builder(
-                  scrollDirection: Axis.vertical,
-                  shrinkWrap: true,
-                  //prototypeItem: PoiCard(poi: poi.first),
-                  itemCount: poi.length,
-                  itemBuilder: (context, index) {
-                    return PoiCard(poi: poi[index]);
-                  },
-                ),
-              );
+              if (poi.isNotEmpty) {
+                return Expanded(
+                  child: ListView.builder(
+                    scrollDirection: Axis.vertical,
+                    shrinkWrap: true,
+                    prototypeItem: PoiCard(poi: poi.first),
+                    itemCount: poi.length,
+                    itemBuilder: (context, index) => PoiCard(poi: poi[index]),
+                  ),
+                );
+              } else {
+                return const Text("No POI near you");
+              }
             } else {
               return const Loading();
             }

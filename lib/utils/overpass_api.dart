@@ -39,7 +39,6 @@ class OverpassApi {
       if (value.statusCode != HttpStatus.ok) {
         return Future.error("Error performing query");
       }
-      print(value.headers);
       final List data = value.data['elements'];
       final res = data
           .map((e) => POI.fromJson(e, position))

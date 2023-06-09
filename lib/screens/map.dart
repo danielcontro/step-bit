@@ -1,5 +1,7 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:stepbit/utils/position.dart';
@@ -48,7 +50,11 @@ class _MapState extends State<MapWidget> {
             return GoogleMap(
               myLocationButtonEnabled: true,
               myLocationEnabled: true,
-              mapType: MapType.normal,
+              mapType: MapType.terrain,
+              gestureRecognizers: <Factory<OneSequenceGestureRecognizer>>{
+                Factory<OneSequenceGestureRecognizer>(
+                    () => EagerGestureRecognizer())
+              },
               initialCameraPosition: CameraPosition(target: position, zoom: 15),
               onMapCreated: (GoogleMapController controller) {
                 _controller.complete(controller);
