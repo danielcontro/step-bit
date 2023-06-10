@@ -1,41 +1,65 @@
+import 'package:animated_digit/animated_digit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:stepbit/models/exercise.dart';
 import 'package:stepbit/utils/app_colors.dart';
+import 'package:stepbit/utils/extension_methods.dart';
 import 'package:stepbit/widgets/activity_card.dart';
 import 'package:stepbit/widgets/quantity_input.dart';
 import 'package:stepbit/widgets/user_greeting.dart';
-import 'package:stepbit/widgets/yesterday_steps.dart';
 
+import '../models/steps.dart';
 import '../utils/api_client.dart';
 import '../widgets/loading.dart';
+import '../widgets/step_ring.dart';
 
 class StartActivity extends StatelessWidget {
   final PageController pageController;
-  final Function(double) mapCallback;
-  double data;
+  final Function(double) setDistanceCallback;
+  final double data;
 
-  StartActivity(
+  const StartActivity(
       {Key? key,
       required this.pageController,
-      required this.mapCallback,
+      required this.setDistanceCallback,
       required this.data})
       : super(key: key);
 
-  _changeprice(double num) {
-    data = num;
-  }
-
   Widget stepsTopBar() {
-    return const Padding(
-      padding: EdgeInsets.fromLTRB(5, 5, 0, 0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          UserGreeting(name: "Luca"),
-          YesterdaySteps(),
-        ],
-      ),
+    return FutureBuilder(
+      future:
+          ApiClient.getSteps(DateTime.now().subtract(const Duration(days: 1))),
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return const Loading();
+        }
+        final steps = snapshot.data as List<Steps>;
+        final dailySteps = steps.map((e) => e.value).sum();
+        return Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const UserGreeting(name: "Luca"),
+                AnimatedDigitWidget(
+                  value: dailySteps,
+                  textStyle: TextStyle(
+                    fontWeight: FontWeight.normal,
+                    fontSize: 17,
+                    color: AppColors.textColor,
+                  ),
+                  prefix: "You walked ",
+                  suffix: " steps yesterday",
+                ),
+              ],
+            ),
+            StepRing(steps: dailySteps)
+          ],
+        );
+      },
     ).animate().fade(duration: 500.ms).slideY(curve: Curves.bounceOut);
   }
 
@@ -73,9 +97,8 @@ class StartActivity extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
-          margin: const EdgeInsets.fromLTRB(5, 20, 5, 0),
-          width: double.infinity,
-          height: 85,
+          margin: const EdgeInsets.fromLTRB(5, 10, 5, 0),
+          height: MediaQuery.of(context).size.height * 0.13,
           decoration: BoxDecoration(
             color: AppColors.boxDecorationColor.withOpacity(0.7),
             borderRadius: const BorderRadius.all(Radius.circular(10)),
@@ -99,10 +122,7 @@ class StartActivity extends StatelessWidget {
             max: 20,
             min: 1,
             step: 1,
-            onChanged: (value) {
-              _changeprice(value);
-              mapCallback(value);
-            },
+            onChanged: (value) => setDistanceCallback(value),
           ),
           /*ElevatedButton(
             // Bottone per iniziare una nuovo allenamento

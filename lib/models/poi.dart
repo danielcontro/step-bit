@@ -9,28 +9,23 @@ import 'dart:math';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class POI {
-  //final POIType type;
-  final double latitude;
-  final double longitude;
+  final LatLng position;
   final double distanceInKm;
   final Map<String, dynamic> tags;
 
-  const POI(
-      {
-      //required this.type,
-      required this.latitude,
-      required this.longitude,
-      required this.tags,
-      required this.distanceInKm});
+  const POI({
+    required this.position,
+    required this.tags,
+    required this.distanceInKm,
+  });
 
-  factory POI.fromJson(Map<String, dynamic> json, LatLng position) {
+  factory POI.fromJson(Map<String, dynamic> json, LatLng myPosition) {
     return POI(
-        //type: POIType.node,
-        latitude: json['lat'],
-        longitude: json['lon'],
-        tags: json['tags'],
-        distanceInKm: getDistanceInKm(
-            json['lat'], json['lon'], position.latitude, position.longitude));
+      position: LatLng(json['lat'], json['lon']),
+      tags: json['tags'],
+      distanceInKm: getDistanceInKm(
+          json['lat'], json['lon'], myPosition.latitude, myPosition.longitude),
+    );
   }
 
   static double getDistanceInKm(
@@ -83,6 +78,6 @@ class POI {
   String toString() {
     var tagsFormatted = tags.entries
         .fold('', (previousValue, element) => '$previousValue, $element');
-    return 'POI(latitude: $latitude, longitude: $longitude, tags: $tagsFormatted)';
+    return 'POI(position: $position, tags: $tagsFormatted)';
   }
 }

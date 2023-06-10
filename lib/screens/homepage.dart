@@ -15,15 +15,9 @@ class HomePageState extends State<HomePage> {
   int selectedIndex = 1;
   final pageController = PageController(initialPage: 1);
 
-  @override
-  void dispose() {
-    pageController.dispose();
-    super.dispose();
-  }
-
-  double data = 1;
-  void onDataChange(double newData) {
-    setState(() => data = newData);
+  double selectedDistance = 1;
+  void setNewDistance(double newDistance) {
+    setState(() => selectedDistance = newDistance);
   }
 
   @override
@@ -56,15 +50,22 @@ class HomePageState extends State<HomePage> {
       body: PageView(
         controller: pageController,
         children: [
-          Favorites(data: data),
+          Favorites(data: selectedDistance),
           StartActivity(
-              pageController: pageController,
-              mapCallback: onDataChange,
-              data: data),
-          MapWidget(data: data)
+            pageController: pageController,
+            setDistanceCallback: setNewDistance,
+            data: selectedDistance,
+          ),
+          MapWidget(data: selectedDistance)
         ],
         onPageChanged: (index) => setState(() => selectedIndex = index),
       ),
     );
+  }
+
+  @override
+  void dispose() {
+    pageController.dispose();
+    super.dispose();
   }
 }

@@ -48,7 +48,7 @@ class _QuantityInput extends State<QuantityInput> {
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             IconButton(
-                iconSize: 50,
+                iconSize: MediaQuery.of(context).size.width * 0.1272,
                 onPressed: () {
                   setState(() {
                     if (_currentValue > widget.min) {
@@ -66,7 +66,7 @@ class _QuantityInput extends State<QuantityInput> {
               style: const TextStyle(fontSize: 30),
             ),
             IconButton(
-                iconSize: 50,
+                iconSize: MediaQuery.of(context).size.width * 0.1272,
                 onPressed: () {
                   setState(() {
                     if (_currentValue < widget.max) {

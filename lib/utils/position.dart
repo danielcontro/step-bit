@@ -35,6 +35,7 @@ Future<LatLng>? getCurrentPosition() async {
 
   // When we reach here, permissions are granted and we can
   // continue accessing the position of the device.
-  final position = await Geolocator.getCurrentPosition();
+  final position = await Geolocator.getCurrentPosition(
+      desiredAccuracy: LocationAccuracy.high);
   return LatLng(position.latitude, position.longitude);
 }

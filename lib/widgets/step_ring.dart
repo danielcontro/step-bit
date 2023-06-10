@@ -14,13 +14,18 @@ class StepRing extends StatelessWidget {
       percent: progress,
       animate: true,
       color: RingColorScheme(
-        ringGradient: [Colors.red, Colors.lime, Colors.green],
+        ringGradient: [
+          Colors.red,
+          Colors.yellow,
+          Colors.lime,
+          Colors.green,
+        ],
       ),
-      radius: 25,
-      width: 5,
+      radius: MediaQuery.of(context).size.width * 0.072,
+      width: MediaQuery.of(context).size.width * 0.01,
       child: Text(
         '${progress.round()}%',
-        style: const TextStyle(fontSize: 14),
+        style: TextStyle(fontSize: MediaQuery.of(context).size.width * 0.035),
       ),
     );
   }

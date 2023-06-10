@@ -40,17 +40,25 @@ class OverpassApi {
         return Future.error("Error performing query");
       }
       final List data = value.data['elements'];
-      final res = data
+      final results = data
           .map((e) => POI.fromJson(e, position))
-          .where((poi) => poi.distanceInKm * 1000 > distance - distance * 0.2)
           .where((poi) => poi.tags.containsKey('name'))
           .toList();
-      res.sort((a, b) => a.distanceInKm.compareTo(b.distanceInKm));
 
-      print('Distance: $distance');
-      print('Distance 20% : ${distance * 0.2}');
-      print('Size: ${res.length}');
-      return res;
+      final results20perc = results
+          .where((poi) => poi.distanceInKm * 1000 > distance - distance * 0.2)
+          .toList();
+
+      print("POI: ${results.length}");
+      print("POI filtered: ${results20perc.length}");
+
+      if (results20perc.length < 5) {
+        results.sort((a, b) => a.distanceInKm.compareTo(b.distanceInKm));
+        return results;
+      } else {
+        results20perc.sort((a, b) => a.distanceInKm.compareTo(b.distanceInKm));
+        return results20perc;
+      }
     });
   }
 }

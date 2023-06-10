@@ -31,7 +31,7 @@ class PoiCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListTile(
       leading: getPoiIcon(),
-      title: Text(poi.getName()),
+      title: Text(poi.getName(), overflow: TextOverflow.ellipsis),
       subtitle: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
