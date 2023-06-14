@@ -34,11 +34,15 @@ class ApiClient {
       if (value.statusCode != HttpStatus.ok) {
         return null;
       }
-      final data = value.data['data']['data'];
-      return data
-          .cast<Map<String, dynamic>>()
-          .map<Steps>((json) => Steps.fromJson(dateFormatted, json))
-          .toList();
+      try {
+        final data = value.data['data']['data'];
+        return data
+            .cast<Map<String, dynamic>>()
+            .map<Steps>((json) => Steps.fromJson(dateFormatted, json))
+            .toList();
+      } catch (e) {
+        return List.empty();
+      }
     });
   }
 
