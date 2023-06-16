@@ -21,6 +21,9 @@ dependencies:
   google_maps_flutter: ^2.3.0
   uuid: ^3.0.7
   geolocator: ^9.0.2
+  map_launcher: ^2.5.0+1
+  geocoding: ^2.1.0
+
 
 dev_dependencies:
   flutter_test:

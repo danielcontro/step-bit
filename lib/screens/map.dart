@@ -5,6 +5,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:stepbit/models/poi.dart';
+import 'package:stepbit/screens/view_poi.dart';
 import 'package:stepbit/utils/position.dart';
 import 'package:stepbit/widgets/loading.dart';
 import 'package:uuid/uuid.dart';
@@ -33,9 +34,11 @@ class _MapState extends State<MapWidget> {
       position: poi.position,
       infoWindow: InfoWindow(
         title: poi.getName(),
-        snippet: 'Distance: ${poi.getDistanceKmOrMeters()}',
-        //https://www.google.com/maps/search/?api=1&query=<lat>,<lng>
-        onTap: () => print("Tap"),
+        snippet: 'Tap to view details',
+        onTap: () {
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => ViewPOI(poi: poi)));
+        },
       ),
     );
     setState(() {

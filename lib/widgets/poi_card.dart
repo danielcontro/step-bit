@@ -6,27 +6,6 @@ class PoiCard extends StatelessWidget {
 
   const PoiCard({super.key, required this.poi});
 
-  Icon getPoiIcon() {
-    return switch (poi.getType().toLowerCase()) {
-      "artwork" || "gallery" => const Icon(Icons.photo),
-      "attraction" => const Icon(Icons.attractions),
-      "viewpoint" => const Icon(Icons.panorama),
-      "museum" => const Icon(Icons.museum),
-      "church" || "chapel" || "place_of_worship" => const Icon(Icons.church),
-      "university" => const Icon(Icons.school),
-      "restaurant" ||
-      "fast_food" ||
-      "bar" ||
-      "cafe" ||
-      "pub" ||
-      "food_court" =>
-        const Icon(Icons.restaurant),
-      "ice_cream" => const Icon(Icons.icecream),
-      "marketplace" => const Icon(Icons.shopping_cart),
-      _ => const Icon(Icons.question_mark)
-    };
-  }
-
   @override
   Widget build(BuildContext context) {
     return Dismissible(
@@ -37,7 +16,7 @@ class PoiCard extends StatelessWidget {
       ),
       onDismissed: (direction) {},
       child: ListTile(
-        leading: getPoiIcon(),
+        leading: poi.getIcon(),
         title: Text(poi.getName(), overflow: TextOverflow.ellipsis),
         subtitle: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
