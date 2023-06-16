@@ -26,12 +26,31 @@ class StartActivity extends StatelessWidget {
       : super(key: key);
 
   Widget stepsTopBar() {
+    final textStyle = TextStyle(
+      fontWeight: FontWeight.normal,
+      fontSize: 17,
+      color: AppColors.textColor,
+    );
     return FutureBuilder(
       future:
           ApiClient.getSteps(DateTime.now().subtract(const Duration(days: 1))),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
-          return const Loading();
+          return Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const UserGreeting(name: "Luca"),
+                  Text("Loading data...", style: textStyle),
+                ],
+              ),
+              const CircularProgressIndicator()
+            ],
+          );
         }
         final steps = snapshot.data as List<Steps>;
         final dailySteps = steps.map((e) => e.value).sum();
@@ -46,11 +65,7 @@ class StartActivity extends StatelessWidget {
                 const UserGreeting(name: "Luca"),
                 AnimatedDigitWidget(
                   value: dailySteps,
-                  textStyle: TextStyle(
-                    fontWeight: FontWeight.normal,
-                    fontSize: 17,
-                    color: AppColors.textColor,
-                  ),
+                  textStyle: textStyle,
                   prefix: "You walked ",
                   suffix: " steps yesterday",
                 ),
@@ -124,29 +139,6 @@ class StartActivity extends StatelessWidget {
             step: 1,
             onChanged: (value) => setDistanceCallback(value),
           ),
-          /*ElevatedButton(
-            // Bottone per iniziare una nuovo allenamento
-            onPressed: () {
-              mapCallback(Random().nextInt(10));
-              pageController.animateToPage(2,
-                  duration: const Duration(milliseconds: 200),
-                  curve: Curves.bounceOut);
-            },
-            style: ButtonStyle(
-              shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                  RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(18.0),
-              )),
-            ),
-            child: const Text(
-              'START',
-              style: TextStyle(
-                fontSize: 25,
-                fontWeight: FontWeight.bold,
-                fontStyle: FontStyle.italic,
-              ),
-            ),
-          ),*/
         ),
         const SizedBox(
           height: 50,

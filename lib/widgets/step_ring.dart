@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:activity_ring/activity_ring.dart';
 import 'package:flutter/material.dart';
 
@@ -11,7 +13,7 @@ class StepRing extends StatelessWidget {
     const stepsGoal = 8000;
     final progress = steps / stepsGoal * 100;
     return Ring(
-      percent: progress,
+      percent: min(299, steps / stepsGoal * 100),
       animate: true,
       color: RingColorScheme(
         ringGradient: [

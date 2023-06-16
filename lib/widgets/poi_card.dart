@@ -29,26 +29,30 @@ class PoiCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      leading: getPoiIcon(),
-      title: Text(poi.getName(), overflow: TextOverflow.ellipsis),
-      subtitle: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          if (poi.getCity() != null)
+    return Dismissible(
+      key: UniqueKey(),
+      background: Container(
+        color: Colors.red,
+        child: const Icon(Icons.delete),
+      ),
+      onDismissed: (direction) {},
+      child: ListTile(
+        leading: getPoiIcon(),
+        title: Text(poi.getName(), overflow: TextOverflow.ellipsis),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (poi.getCity() != null)
+              Row(children: [
+                const Icon(Icons.location_city, size: 15),
+                Text(poi.getCity()!),
+              ]),
             Row(children: [
-              const Icon(Icons.location_city, size: 15),
-              Text(poi.getCity()!),
+              const Icon(Icons.timeline, size: 15),
+              Text(poi.getDistanceKmOrMeters()),
             ]),
-          Row(children: [
-            const Icon(Icons.timeline, size: 15),
-            Text(poi.getDistanceKmOrMeters()),
-          ]),
-          /*Row(children: [
-            const Icon(Icons.pin_drop, size: 15),
-            Text('${poi.latitude} ${poi.longitude}'),
-          ])*/
-        ],
+          ],
+        ),
       ),
     );
   }
