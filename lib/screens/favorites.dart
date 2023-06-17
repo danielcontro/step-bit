@@ -65,7 +65,7 @@ class Favorites extends StatelessWidget {
                   return const Text("No POI near you");
                 }
               } else {
-                return const CircularProgressIndicator();
+                return const Text("No Favorites");
               }
             },
           );

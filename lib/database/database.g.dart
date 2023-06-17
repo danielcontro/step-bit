@@ -264,14 +264,6 @@ class _$FavoriteDao extends FavoriteDao {
   }
 
   @override
-  Stream<List<String>> findFavoriteByName() {
-    return _queryAdapter.queryListStream('SELECT name FROM Favorite',
-        mapper: (Map<String, Object?> row) => row.values.first as String,
-        queryableName: 'Favorite',
-        isView: false);
-  }
-
-  @override
   Stream<Favorite?> findFavoriteById(int id) {
     return _queryAdapter.queryStream('SELECT * FROM Favorite WHERE id = ?1',
         mapper: (Map<String, Object?> row) => Favorite(
@@ -305,6 +297,23 @@ class _$FavoriteDao extends FavoriteDao {
             row['website'] as String,
             row['type'] as String),
         arguments: [lat, lng],
+        queryableName: 'Favorite',
+        isView: false);
+  }
+
+  @override
+  Stream<Favorite?> findFavoriteByName(String name) {
+    return _queryAdapter.queryStream('SELECT * FROM Favorite WHERE name = ?1',
+        mapper: (Map<String, Object?> row) => Favorite(
+            row['id'] as int,
+            row['name'] as String,
+            row['city'] as String?,
+            row['lat'] as double,
+            row['lng'] as double,
+            row['address'] as String?,
+            row['website'] as String,
+            row['type'] as String),
+        arguments: [name],
         queryableName: 'Favorite',
         isView: false);
   }
@@ -367,25 +376,17 @@ class _$PersonFavoriteDao extends PersonFavoriteDao {
   final DeletionAdapter<PersonFavorite> _personFavoriteDeletionAdapter;
 
   @override
-  Future<Favorite?> findFavoritesByPersonId(int id) async {
-    return _queryAdapter.query(
-        'SELECT * FROM PersonFavorite WHERE personId = ?1',
-        mapper: (Map<String, Object?> row) => Favorite(
-            row['id'] as int,
-            row['name'] as String,
-            row['city'] as String?,
-            row['lat'] as double,
-            row['lng'] as double,
-            row['address'] as String?,
-            row['website'] as String,
-            row['type'] as String),
+  Future<List<Favorite>?> findFavoritesByPersonId(int id) async {
+    return _queryAdapter.queryList(
+        'SELECT Favorite.* FROM PersonFavorite INNER JOIN Favorite ON Favorite.id = PersonFavorite.favoriteId WHERE personId = ?1',
+        mapper: (Map<String, Object?> row) => Favorite(row['id'] as int, row['name'] as String, row['city'] as String?, row['lat'] as double, row['lng'] as double, row['address'] as String?, row['website'] as String, row['type'] as String),
         arguments: [id]);
   }
 
   @override
-  Stream<Person?> findPeopleByFavoriteId(int id) {
-    return _queryAdapter.queryStream(
-        'SELECT * FROM PersonFavorite WHERE favoriteId = ?1',
+  Stream<List<Person>?> findPeopleByFavoriteId(int id) {
+    return _queryAdapter.queryListStream(
+        'SELECT Person.* FROM PersonFavorite INNER JOIN Person ON Person.id = PersonFavorite.personId WHERE favoriteId = ?1',
         mapper: (Map<String, Object?> row) =>
             Person(row['id'] as int?, row['name'] as String),
         arguments: [id],
