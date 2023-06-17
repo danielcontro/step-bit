@@ -19,7 +19,7 @@ class PersonFavorite {
   @ColumnInfo(name: 'personId')
   final int personId;
   @ColumnInfo(name: 'favoriteId')
-  final int favoriteId;
+  final String favoriteId;
 
   PersonFavorite(this.personId, this.favoriteId);
 }

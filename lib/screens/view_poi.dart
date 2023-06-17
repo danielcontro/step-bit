@@ -1,8 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:map_launcher/map_launcher.dart';
+import 'package:provider/provider.dart';
+import 'package:stepbit/database/entities/favorite.dart';
+import 'package:stepbit/database/entities/person_favorite.dart';
 import 'package:stepbit/models/poi.dart';
 import 'package:stepbit/utils/extension_methods.dart';
+import 'package:uuid/uuid.dart';
+
+import '../repositories/database_repository.dart';
 
 class ViewPOI extends StatelessWidget {
   final POI poi;
@@ -93,7 +99,7 @@ class ViewPOI extends StatelessWidget {
                 child: const Text("View on the map"),
               ),
               ElevatedButton(
-                onPressed: () {},
+                onPressed: () => _addFavorite(context),
                 child: const Text("Add to favorites"),
               ),
             ],
@@ -101,5 +107,37 @@ class ViewPOI extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  void _addFavorite(BuildContext context) async {
+    final city = await getCity();
+    final id = const Uuid().v4();
+    if (context.mounted) {
+      await Provider.of<DatabaseRepository>(context, listen: false)
+          .database
+          .favoriteDao
+          .insertFavorite(Favorite(
+            id,
+            poi.getName(),
+            city ?? "",
+            poi.position.latitude,
+            poi.position.longitude,
+            poi.getStreet() ?? "",
+            poi.getType(),
+          ));
+    }
+    if (context.mounted) {
+      await Provider.of<DatabaseRepository>(context, listen: false)
+          .database
+          .personFavoriteDao
+          .insertPersonFavorite(PersonFavorite(1, id));
+    }
+    if (context.mounted) {
+      ScaffoldMessenger.of(context)
+        ..removeCurrentSnackBar()
+        ..showSnackBar(
+          const SnackBar(content: Text('Added to favorites')),
+        );
+    }
   }
 }

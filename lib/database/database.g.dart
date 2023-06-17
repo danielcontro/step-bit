@@ -91,9 +91,9 @@ class _$AppDatabase extends AppDatabase {
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `Person` (`id` INTEGER, `name` TEXT NOT NULL, PRIMARY KEY (`id`))');
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `Favorite` (`id` INTEGER NOT NULL, `name` TEXT NOT NULL, `city` TEXT, `lat` REAL NOT NULL, `lng` REAL NOT NULL, `address` TEXT, `website` TEXT NOT NULL, `type` TEXT NOT NULL, PRIMARY KEY (`id`))');
+            'CREATE TABLE IF NOT EXISTS `Favorite` (`id` TEXT NOT NULL, `name` TEXT NOT NULL, `city` TEXT NOT NULL, `lat` REAL NOT NULL, `lng` REAL NOT NULL, `address` TEXT, `type` TEXT NOT NULL, PRIMARY KEY (`id`))');
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `PersonFavorite` (`personId` INTEGER NOT NULL, `favoriteId` INTEGER NOT NULL, FOREIGN KEY (`personId`) REFERENCES `Person` (`id`) ON UPDATE NO ACTION ON DELETE NO ACTION, FOREIGN KEY (`favoriteId`) REFERENCES `Favorite` (`id`) ON UPDATE NO ACTION ON DELETE NO ACTION, PRIMARY KEY (`personId`, `favoriteId`))');
+            'CREATE TABLE IF NOT EXISTS `PersonFavorite` (`personId` INTEGER NOT NULL, `favoriteId` TEXT NOT NULL, FOREIGN KEY (`personId`) REFERENCES `Person` (`id`) ON UPDATE NO ACTION ON DELETE NO ACTION, FOREIGN KEY (`favoriteId`) REFERENCES `Favorite` (`id`) ON UPDATE NO ACTION ON DELETE NO ACTION, PRIMARY KEY (`personId`, `favoriteId`))');
 
         await callback?.onCreate?.call(database, version);
       },
@@ -202,7 +202,6 @@ class _$FavoriteDao extends FavoriteDao {
                   'lat': item.lat,
                   'lng': item.lng,
                   'address': item.address,
-                  'website': item.website,
                   'type': item.type
                 },
             changeListener),
@@ -217,7 +216,6 @@ class _$FavoriteDao extends FavoriteDao {
                   'lat': item.lat,
                   'lng': item.lng,
                   'address': item.address,
-                  'website': item.website,
                   'type': item.type
                 },
             changeListener),
@@ -232,7 +230,6 @@ class _$FavoriteDao extends FavoriteDao {
                   'lat': item.lat,
                   'lng': item.lng,
                   'address': item.address,
-                  'website': item.website,
                   'type': item.type
                 },
             changeListener);
@@ -253,13 +250,12 @@ class _$FavoriteDao extends FavoriteDao {
   Future<List<Favorite>> findAllFavorite() async {
     return _queryAdapter.queryList('SELECT * FROM Favorite',
         mapper: (Map<String, Object?> row) => Favorite(
-            row['id'] as int,
+            row['id'] as String,
             row['name'] as String,
-            row['city'] as String?,
+            row['city'] as String,
             row['lat'] as double,
             row['lng'] as double,
             row['address'] as String?,
-            row['website'] as String,
             row['type'] as String));
   }
 
@@ -267,13 +263,12 @@ class _$FavoriteDao extends FavoriteDao {
   Stream<Favorite?> findFavoriteById(int id) {
     return _queryAdapter.queryStream('SELECT * FROM Favorite WHERE id = ?1',
         mapper: (Map<String, Object?> row) => Favorite(
-            row['id'] as int,
+            row['id'] as String,
             row['name'] as String,
-            row['city'] as String?,
+            row['city'] as String,
             row['lat'] as double,
             row['lng'] as double,
             row['address'] as String?,
-            row['website'] as String,
             row['type'] as String),
         arguments: [id],
         queryableName: 'Favorite',
@@ -288,13 +283,12 @@ class _$FavoriteDao extends FavoriteDao {
     return _queryAdapter.queryStream(
         'SELECT * FROM Favorite WHERE lat = ?1 AND lng = ?2',
         mapper: (Map<String, Object?> row) => Favorite(
-            row['id'] as int,
+            row['id'] as String,
             row['name'] as String,
-            row['city'] as String?,
+            row['city'] as String,
             row['lat'] as double,
             row['lng'] as double,
             row['address'] as String?,
-            row['website'] as String,
             row['type'] as String),
         arguments: [lat, lng],
         queryableName: 'Favorite',
@@ -305,13 +299,12 @@ class _$FavoriteDao extends FavoriteDao {
   Stream<Favorite?> findFavoriteByName(String name) {
     return _queryAdapter.queryStream('SELECT * FROM Favorite WHERE name = ?1',
         mapper: (Map<String, Object?> row) => Favorite(
-            row['id'] as int,
+            row['id'] as String,
             row['name'] as String,
-            row['city'] as String?,
+            row['city'] as String,
             row['lat'] as double,
             row['lng'] as double,
             row['address'] as String?,
-            row['website'] as String,
             row['type'] as String),
         arguments: [name],
         queryableName: 'Favorite',
@@ -376,10 +369,10 @@ class _$PersonFavoriteDao extends PersonFavoriteDao {
   final DeletionAdapter<PersonFavorite> _personFavoriteDeletionAdapter;
 
   @override
-  Future<List<Favorite>?> findFavoritesByPersonId(int id) async {
+  Future<List<Favorite>> findFavoritesByPersonId(int id) async {
     return _queryAdapter.queryList(
-        'SELECT Favorite.* FROM PersonFavorite INNER JOIN Favorite ON Favorite.id = PersonFavorite.favoriteId WHERE personId = ?1',
-        mapper: (Map<String, Object?> row) => Favorite(row['id'] as int, row['name'] as String, row['city'] as String?, row['lat'] as double, row['lng'] as double, row['address'] as String?, row['website'] as String, row['type'] as String),
+        'SELECT Favorite.*     FROM PersonFavorite     INNER JOIN Favorite ON Favorite.id = PersonFavorite.favoriteId     WHERE personId = ?1',
+        mapper: (Map<String, Object?> row) => Favorite(row['id'] as String, row['name'] as String, row['city'] as String, row['lat'] as double, row['lng'] as double, row['address'] as String?, row['type'] as String),
         arguments: [id]);
   }
 

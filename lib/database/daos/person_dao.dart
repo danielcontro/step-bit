@@ -2,7 +2,7 @@ import 'package:floor/floor.dart';
 
 import '../entities/person.dart';
 
-// flutter packages pub run build_runner build
+// dart run build_runner build
 
 @dao
 abstract class PersonDao {
