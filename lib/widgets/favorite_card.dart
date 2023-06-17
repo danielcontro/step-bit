@@ -9,7 +9,7 @@ class FavoriteCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Dismissible(
-      key: UniqueKey(),
+      key: ValueKey<String>(favorite.id),
       background: Container(
         color: Colors.red,
         child: const Icon(Icons.delete),
