@@ -114,23 +114,17 @@ class ViewPOI extends StatelessWidget {
     final id = const Uuid().v4();
     if (context.mounted) {
       await Provider.of<DatabaseRepository>(context, listen: false)
-          .database
-          .favoriteDao
-          .insertFavorite(Favorite(
-            id,
-            poi.getName(),
-            city ?? "",
-            poi.position.latitude,
-            poi.position.longitude,
-            poi.getStreet() ?? "",
-            poi.getType(),
-          ));
-    }
-    if (context.mounted) {
-      await Provider.of<DatabaseRepository>(context, listen: false)
-          .database
-          .personFavoriteDao
-          .insertPersonFavorite(PersonFavorite(1, id));
+          .addNewFavorite(
+              Favorite(
+                id,
+                poi.getName(),
+                city ?? "",
+                poi.position.latitude,
+                poi.position.longitude,
+                poi.getStreet() ?? "",
+                poi.getType(),
+              ),
+              PersonFavorite(1, id));
     }
     if (context.mounted) {
       ScaffoldMessenger.of(context)

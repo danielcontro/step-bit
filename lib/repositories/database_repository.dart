@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:stepbit/database/entities/favorite.dart';
 import 'package:stepbit/database/entities/person_favorite.dart';
 
 import '../database/database.dart';
@@ -34,6 +35,15 @@ class DatabaseRepository extends ChangeNotifier {
   //Then, it notifies the listeners that something changed.
   Future<void> removePersonFavorite(PersonFavorite personFavorite) async {
     await database.personFavoriteDao.deletePersonFavorite(personFavorite);
+    notifyListeners();
+  }
+
+  Future<void> addNewFavorite(
+    Favorite favorite,
+    PersonFavorite personFavorite,
+  ) async {
+    await database.favoriteDao.insertFavorite(favorite);
+    await database.personFavoriteDao.insertPersonFavorite(personFavorite);
     notifyListeners();
   }
 } //DatabaseRepository
