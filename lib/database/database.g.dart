@@ -91,7 +91,7 @@ class _$AppDatabase extends AppDatabase {
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `Person` (`id` INTEGER, `name` TEXT NOT NULL, PRIMARY KEY (`id`))');
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `Favorite` (`id` INTEGER NOT NULL, `name` TEXT NOT NULL, PRIMARY KEY (`id`))');
+            'CREATE TABLE IF NOT EXISTS `Favorite` (`id` INTEGER NOT NULL, `name` TEXT NOT NULL, `city` TEXT, `lat` REAL NOT NULL, `lng` REAL NOT NULL, `address` TEXT, `website` TEXT NOT NULL, `type` TEXT NOT NULL, PRIMARY KEY (`id`))');
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `PersonFavorite` (`personId` INTEGER NOT NULL, `favoriteId` INTEGER NOT NULL, FOREIGN KEY (`personId`) REFERENCES `Person` (`id`) ON UPDATE NO ACTION ON DELETE NO ACTION, FOREIGN KEY (`favoriteId`) REFERENCES `Favorite` (`id`) ON UPDATE NO ACTION ON DELETE NO ACTION, PRIMARY KEY (`personId`, `favoriteId`))');
 
@@ -122,7 +122,7 @@ class _$PersonDao extends PersonDao {
   _$PersonDao(
     this.database,
     this.changeListener,
-  )   : _queryAdapter = QueryAdapter(database, changeListener),
+  )   : _queryAdapter = QueryAdapter(database),
         _personInsertionAdapter = InsertionAdapter(
             database,
             'Person',
@@ -130,13 +130,6 @@ class _$PersonDao extends PersonDao {
                 <String, Object?>{'id': item.id, 'name': item.name},
             changeListener),
         _personUpdateAdapter = UpdateAdapter(
-            database,
-            'Person',
-            ['id'],
-            (Person item) =>
-                <String, Object?>{'id': item.id, 'name': item.name},
-            changeListener),
-        _personDeletionAdapter = DeletionAdapter(
             database,
             'Person',
             ['id'],
@@ -154,8 +147,6 @@ class _$PersonDao extends PersonDao {
 
   final UpdateAdapter<Person> _personUpdateAdapter;
 
-  final DeletionAdapter<Person> _personDeletionAdapter;
-
   @override
   Future<List<Person>> findAllPeople() async {
     return _queryAdapter.queryList('SELECT * FROM Person',
@@ -172,13 +163,17 @@ class _$PersonDao extends PersonDao {
   }
 
   @override
-  Stream<Person?> findPersonById(int id) {
-    return _queryAdapter.queryStream('SELECT * FROM Person WHERE id = ?1',
+  Future<Person?> findPersonById(int id) async {
+    return _queryAdapter.query('SELECT * FROM Person WHERE id = ?1',
         mapper: (Map<String, Object?> row) =>
             Person(row['id'] as int?, row['name'] as String),
-        arguments: [id],
-        queryableName: 'Person',
-        isView: false);
+        arguments: [id]);
+  }
+
+  @override
+  Future<int?> countRows() async {
+    return _queryAdapter.query('SELECT COUNT(*) FROM Person',
+        mapper: (Map<String, Object?> row) => row.values.first as int);
   }
 
   @override
@@ -190,11 +185,6 @@ class _$PersonDao extends PersonDao {
   Future<void> updatePerson(Person person) async {
     await _personUpdateAdapter.update(person, OnConflictStrategy.replace);
   }
-
-  @override
-  Future<void> deletePerson(Person person) async {
-    await _personDeletionAdapter.delete(person);
-  }
 }
 
 class _$FavoriteDao extends FavoriteDao {
@@ -205,22 +195,46 @@ class _$FavoriteDao extends FavoriteDao {
         _favoriteInsertionAdapter = InsertionAdapter(
             database,
             'Favorite',
-            (Favorite item) =>
-                <String, Object?>{'id': item.id, 'name': item.name},
+            (Favorite item) => <String, Object?>{
+                  'id': item.id,
+                  'name': item.name,
+                  'city': item.city,
+                  'lat': item.lat,
+                  'lng': item.lng,
+                  'address': item.address,
+                  'website': item.website,
+                  'type': item.type
+                },
             changeListener),
         _favoriteUpdateAdapter = UpdateAdapter(
             database,
             'Favorite',
             ['id'],
-            (Favorite item) =>
-                <String, Object?>{'id': item.id, 'name': item.name},
+            (Favorite item) => <String, Object?>{
+                  'id': item.id,
+                  'name': item.name,
+                  'city': item.city,
+                  'lat': item.lat,
+                  'lng': item.lng,
+                  'address': item.address,
+                  'website': item.website,
+                  'type': item.type
+                },
             changeListener),
         _favoriteDeletionAdapter = DeletionAdapter(
             database,
             'Favorite',
             ['id'],
-            (Favorite item) =>
-                <String, Object?>{'id': item.id, 'name': item.name},
+            (Favorite item) => <String, Object?>{
+                  'id': item.id,
+                  'name': item.name,
+                  'city': item.city,
+                  'lat': item.lat,
+                  'lng': item.lng,
+                  'address': item.address,
+                  'website': item.website,
+                  'type': item.type
+                },
             changeListener);
 
   final sqflite.DatabaseExecutor database;
@@ -238,8 +252,15 @@ class _$FavoriteDao extends FavoriteDao {
   @override
   Future<List<Favorite>> findAllFavorite() async {
     return _queryAdapter.queryList('SELECT * FROM Favorite',
-        mapper: (Map<String, Object?> row) =>
-            Favorite(row['id'] as int, row['name'] as String));
+        mapper: (Map<String, Object?> row) => Favorite(
+            row['id'] as int,
+            row['name'] as String,
+            row['city'] as String?,
+            row['lat'] as double,
+            row['lng'] as double,
+            row['address'] as String?,
+            row['website'] as String,
+            row['type'] as String));
   }
 
   @override
@@ -253,9 +274,37 @@ class _$FavoriteDao extends FavoriteDao {
   @override
   Stream<Favorite?> findFavoriteById(int id) {
     return _queryAdapter.queryStream('SELECT * FROM Favorite WHERE id = ?1',
-        mapper: (Map<String, Object?> row) =>
-            Favorite(row['id'] as int, row['name'] as String),
+        mapper: (Map<String, Object?> row) => Favorite(
+            row['id'] as int,
+            row['name'] as String,
+            row['city'] as String?,
+            row['lat'] as double,
+            row['lng'] as double,
+            row['address'] as String?,
+            row['website'] as String,
+            row['type'] as String),
         arguments: [id],
+        queryableName: 'Favorite',
+        isView: false);
+  }
+
+  @override
+  Stream<Favorite?> findFavoriteByPosition(
+    double lat,
+    double lng,
+  ) {
+    return _queryAdapter.queryStream(
+        'SELECT * FROM Favorite WHERE lat = ?1 AND lng = ?2',
+        mapper: (Map<String, Object?> row) => Favorite(
+            row['id'] as int,
+            row['name'] as String,
+            row['city'] as String?,
+            row['lat'] as double,
+            row['lng'] as double,
+            row['address'] as String?,
+            row['website'] as String,
+            row['type'] as String),
+        arguments: [lat, lng],
         queryableName: 'Favorite',
         isView: false);
   }
@@ -287,8 +336,7 @@ class _$PersonFavoriteDao extends PersonFavoriteDao {
             (PersonFavorite item) => <String, Object?>{
                   'personId': item.personId,
                   'favoriteId': item.favoriteId
-                },
-            changeListener),
+                }),
         _personFavoriteUpdateAdapter = UpdateAdapter(
             database,
             'PersonFavorite',
@@ -296,8 +344,7 @@ class _$PersonFavoriteDao extends PersonFavoriteDao {
             (PersonFavorite item) => <String, Object?>{
                   'personId': item.personId,
                   'favoriteId': item.favoriteId
-                },
-            changeListener),
+                }),
         _personFavoriteDeletionAdapter = DeletionAdapter(
             database,
             'PersonFavorite',
@@ -305,8 +352,7 @@ class _$PersonFavoriteDao extends PersonFavoriteDao {
             (PersonFavorite item) => <String, Object?>{
                   'personId': item.personId,
                   'favoriteId': item.favoriteId
-                },
-            changeListener);
+                });
 
   final sqflite.DatabaseExecutor database;
 
@@ -321,22 +367,27 @@ class _$PersonFavoriteDao extends PersonFavoriteDao {
   final DeletionAdapter<PersonFavorite> _personFavoriteDeletionAdapter;
 
   @override
-  Stream<PersonFavorite?> findFavoritesByPersonId(int id) {
-    return _queryAdapter.queryStream(
+  Future<Favorite?> findFavoritesByPersonId(int id) async {
+    return _queryAdapter.query(
         'SELECT * FROM PersonFavorite WHERE personId = ?1',
-        mapper: (Map<String, Object?> row) =>
-            PersonFavorite(row['personId'] as int, row['favoriteId'] as int),
-        arguments: [id],
-        queryableName: 'PersonFavorite',
-        isView: false);
+        mapper: (Map<String, Object?> row) => Favorite(
+            row['id'] as int,
+            row['name'] as String,
+            row['city'] as String?,
+            row['lat'] as double,
+            row['lng'] as double,
+            row['address'] as String?,
+            row['website'] as String,
+            row['type'] as String),
+        arguments: [id]);
   }
 
   @override
-  Stream<PersonFavorite?> findPeopleByFavoriteId(int id) {
+  Stream<Person?> findPeopleByFavoriteId(int id) {
     return _queryAdapter.queryStream(
         'SELECT * FROM PersonFavorite WHERE favoriteId = ?1',
         mapper: (Map<String, Object?> row) =>
-            PersonFavorite(row['personId'] as int, row['favoriteId'] as int),
+            Person(row['id'] as int?, row['name'] as String),
         arguments: [id],
         queryableName: 'PersonFavorite',
         isView: false);

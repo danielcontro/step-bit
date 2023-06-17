@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:stepbit/database/entities/person_favorite.dart';
 
 import '../database/database.dart';
 import '../database/entities/person.dart';
@@ -22,17 +23,17 @@ class DatabaseRepository extends ChangeNotifier {
     notifyListeners();
   }
 
-  //This method wraps the deleteMeal() method of the DAO.
-  //Then, it notifies the listeners that something changed.
-  Future<void> removePerson(Person person) async {
-    await database.personDao.deletePerson(person);
-    notifyListeners();
-  }
-
   //This method wraps the updatePerson() method of the DAO.
   //Then, it notifies the listeners that something changed.
   Future<void> updatePerson(Person person) async {
     await database.personDao.updatePerson(person);
+    notifyListeners();
+  }
+
+  //This method wraps the deleteMeal() method of the DAO.
+  //Then, it notifies the listeners that something changed.
+  Future<void> removePersonFavorite(PersonFavorite personFavorite) async {
+    await database.personFavoriteDao.deletePersonFavorite(personFavorite);
     notifyListeners();
   }
 } //DatabaseRepository

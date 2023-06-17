@@ -2,6 +2,8 @@ import 'package:floor/floor.dart';
 
 import '../entities/person.dart';
 
+// flutter packages pub run build_runner build
+
 @dao
 abstract class PersonDao {
   @Query('SELECT * FROM Person')
@@ -11,13 +13,13 @@ abstract class PersonDao {
   Stream<List<String>> findAllPeopleName();
 
   @Query('SELECT * FROM Person WHERE id = :id')
-  Stream<Person?> findPersonById(int id);
+  Future<Person?> findPersonById(int id);
+
+  @Query('SELECT COUNT(*) FROM Person')
+  Future<int?> countRows();
 
   @insert
   Future<void> insertPerson(Person person);
-
-  @delete
-  Future<void> deletePerson(Person person);
 
   @Update(onConflict: OnConflictStrategy.replace)
   Future<void> updatePerson(Person person);

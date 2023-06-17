@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:stepbit/database/entities/person.dart';
 import 'package:stepbit/screens/homepage.dart';
 import 'package:stepbit/screens/login.dart';
 import 'package:stepbit/utils/app_colors.dart';
@@ -18,8 +19,16 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   //This opens the database.
-  final database =
+  final AppDatabase database =
       await $FloorAppDatabase.databaseBuilder('app_database.db').build();
+
+  final personDao = database.personDao;
+  final person = Person(1, 'Luca');
+  final rows = await personDao.countRows();
+  if (rows != null && rows == 0) {
+    await personDao.insertPerson(person);
+  }
+
   //This creates a new DatabaseRepository from the AppDatabase instance just initialized
   final databaseRepository = DatabaseRepository(database: database);
 
