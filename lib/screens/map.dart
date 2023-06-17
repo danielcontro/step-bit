@@ -5,6 +5,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:stepbit/models/poi.dart';
+import 'package:stepbit/screens/view_poi.dart';
 import 'package:stepbit/utils/position.dart';
 import 'package:stepbit/widgets/loading.dart';
 import 'package:uuid/uuid.dart';
@@ -14,7 +15,7 @@ import '../utils/overpass_api.dart';
 class MapWidget extends StatefulWidget {
   late final double data;
 
-  MapWidget({Key? key, required data}) : super(key: key) {
+  MapWidget({Key? key, required double data}) : super(key: key) {
     this.data = data * 500;
   }
 
@@ -33,9 +34,11 @@ class _MapState extends State<MapWidget> {
       position: poi.position,
       infoWindow: InfoWindow(
         title: poi.getName(),
-        snippet: 'Distance: ${poi.getDistanceKmOrMeters()}',
-        //https://www.google.com/maps/search/?api=1&query=<lat>,<lng>
-        onTap: () => print("Tap"),
+        snippet: 'Tap to view details',
+        onTap: () {
+          Navigator.push(context,
+              MaterialPageRoute(builder: (context) => ViewPOI(poi: poi)));
+        },
       ),
     );
     setState(() {
@@ -76,7 +79,7 @@ class _MapState extends State<MapWidget> {
         return GoogleMap(
           myLocationButtonEnabled: true,
           myLocationEnabled: true,
-          mapType: MapType.terrain,
+          buildingsEnabled: false,
           gestureRecognizers: {
             Factory<OneSequenceGestureRecognizer>(
                 () => EagerGestureRecognizer())
@@ -84,7 +87,28 @@ class _MapState extends State<MapWidget> {
           initialCameraPosition: CameraPosition(target: position, zoom: 15),
           onMapCreated: (controller) async {
             _controller = controller;
+            _controller.setMapStyle("""
+            [
+              {
+                "elementType": "labels",
+                "stylers": [
+                  {
+                    "visibility": "off"
+                  }
+                ]
+              },
+              {
+                "featureType": "administrative.locality",
+                "stylers": [
+                  {
+                    "visibility": "on"
+                  }
+                ]
+              }
+            ]""");
+
             final poi = await _fetchPOI(position, widget.data);
+            _markers.clear();
             for (var element in poi) {
               _addMarker(element);
             }

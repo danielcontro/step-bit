@@ -6,6 +6,7 @@ amenity = [place_of_worship, restaurant, fast_food, cafe, bar, pub, food_court, 
 */
 import 'dart:math';
 
+import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class POI {
@@ -49,7 +50,13 @@ class POI {
     }
   }
 
-  String getStreet() => tags['addr:street'];
+  String? getStreet() {
+    if (tags.keys.contains('addr:street')) {
+      return tags['addr:street'];
+    } else {
+      return null;
+    }
+  }
 
   String getWebsite() => tags['website'];
 
@@ -72,6 +79,27 @@ class POI {
       return '${(distanceInKm * 1000).round()} m';
     }
     return '$distanceInKm km';
+  }
+
+  Icon getIcon() {
+    return switch (getType().toLowerCase()) {
+      "artwork" || "gallery" => const Icon(Icons.photo),
+      "attraction" => const Icon(Icons.attractions),
+      "viewpoint" => const Icon(Icons.panorama),
+      "museum" => const Icon(Icons.museum),
+      "church" || "chapel" || "place_of_worship" => const Icon(Icons.church),
+      "university" => const Icon(Icons.school),
+      "restaurant" ||
+      "fast_food" ||
+      "bar" ||
+      "cafe" ||
+      "pub" ||
+      "food_court" =>
+        const Icon(Icons.restaurant),
+      "ice_cream" => const Icon(Icons.icecream),
+      "marketplace" => const Icon(Icons.shopping_cart),
+      _ => const Icon(Icons.question_mark)
+    };
   }
 
   @override
