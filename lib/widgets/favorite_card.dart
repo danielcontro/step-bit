@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:map_launcher/map_launcher.dart';
 import 'package:provider/provider.dart';
 import 'package:stepbit/database/entities/favorite.dart';
+import 'package:stepbit/models/poi.dart';
 
 import '../repositories/database_repository.dart';
 
@@ -23,7 +24,7 @@ class FavoriteCard extends StatelessWidget {
             .deleteFavorite(favorite);
       },
       child: ListTile(
-        leading: favorite.getIcon(),
+        leading: POI.getIcon(favorite.type),
         title: Text(favorite.name, overflow: TextOverflow.ellipsis),
         subtitle: Row(
           children: [

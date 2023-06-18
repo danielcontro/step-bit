@@ -81,8 +81,8 @@ class POI {
     return '$distanceInKm km';
   }
 
-  Icon getIcon() {
-    return switch (getType().toLowerCase()) {
+  static Icon getIcon(String type) {
+    return switch (type.toLowerCase()) {
       "artwork" || "gallery" => const Icon(Icons.photo),
       "attraction" => const Icon(Icons.attractions),
       "viewpoint" => const Icon(Icons.panorama),

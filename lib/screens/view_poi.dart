@@ -66,7 +66,7 @@ class ViewPOI extends StatelessWidget {
           ),
           Row(children: [
             const Text('Type: ', style: textStyle),
-            poi.getIcon(),
+            POI.getIcon(poi.getType()),
             Text(' ${poi.getType().capitalize()}', style: textStyle),
           ]),
           Row(children: [
