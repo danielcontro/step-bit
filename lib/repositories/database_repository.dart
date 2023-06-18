@@ -6,10 +6,8 @@ import '../database/database.dart';
 import '../database/entities/person.dart';
 
 class DatabaseRepository extends ChangeNotifier {
-  //The state of the database is just the AppDatabase
   final AppDatabase database;
 
-  //Default constructor
   DatabaseRepository({required this.database});
 
   Future<List<Person>> findAllPeople() async {
@@ -24,17 +22,13 @@ class DatabaseRepository extends ChangeNotifier {
     notifyListeners();
   }
 
-  //This method wraps the updatePerson() method of the DAO.
-  //Then, it notifies the listeners that something changed.
   Future<void> updatePerson(Person person) async {
     await database.personDao.updatePerson(person);
     notifyListeners();
   }
 
-  //This method wraps the deleteMeal() method of the DAO.
-  //Then, it notifies the listeners that something changed.
-  Future<void> removePersonFavorite(PersonFavorite personFavorite) async {
-    await database.personFavoriteDao.deletePersonFavorite(personFavorite);
+  Future<void> deleteFavorite(Favorite favorite) async {
+    await database.favoriteDao.deleteFavorite(favorite);
     notifyListeners();
   }
 
@@ -46,4 +40,4 @@ class DatabaseRepository extends ChangeNotifier {
     await database.personFavoriteDao.insertPersonFavorite(personFavorite);
     notifyListeners();
   }
-} //DatabaseRepository
+}

@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:stepbit/database/entities/favorite.dart';
+
+import '../repositories/database_repository.dart';
 
 class FavoriteCard extends StatelessWidget {
   final Favorite favorite;
@@ -9,12 +12,15 @@ class FavoriteCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Dismissible(
-      key: ValueKey<String>(favorite.id),
+      key: UniqueKey(),
       background: Container(
         color: Colors.red,
         child: const Icon(Icons.delete),
       ),
-      onDismissed: (direction) {},
+      onDismissed: (direction) async {
+        await Provider.of<DatabaseRepository>(context, listen: false)
+            .deleteFavorite(favorite);
+      },
       child: ListTile(
         leading: favorite.getIcon(),
         title: Text(favorite.name, overflow: TextOverflow.ellipsis),

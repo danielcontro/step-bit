@@ -93,7 +93,7 @@ class _$AppDatabase extends AppDatabase {
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `Favorite` (`id` TEXT NOT NULL, `name` TEXT NOT NULL, `city` TEXT NOT NULL, `lat` REAL NOT NULL, `lng` REAL NOT NULL, `address` TEXT, `type` TEXT NOT NULL, PRIMARY KEY (`id`))');
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `PersonFavorite` (`personId` INTEGER NOT NULL, `favoriteId` TEXT NOT NULL, FOREIGN KEY (`personId`) REFERENCES `Person` (`id`) ON UPDATE NO ACTION ON DELETE NO ACTION, FOREIGN KEY (`favoriteId`) REFERENCES `Favorite` (`id`) ON UPDATE NO ACTION ON DELETE NO ACTION, PRIMARY KEY (`personId`, `favoriteId`))');
+            'CREATE TABLE IF NOT EXISTS `PersonFavorite` (`personId` INTEGER NOT NULL, `favoriteId` TEXT NOT NULL, FOREIGN KEY (`personId`) REFERENCES `Person` (`id`) ON UPDATE CASCADE ON DELETE CASCADE, FOREIGN KEY (`favoriteId`) REFERENCES `Favorite` (`id`) ON UPDATE CASCADE ON DELETE CASCADE, PRIMARY KEY (`personId`, `favoriteId`))');
 
         await callback?.onCreate?.call(database, version);
       },

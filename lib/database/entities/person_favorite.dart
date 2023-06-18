@@ -10,9 +10,18 @@ import 'person.dart';
   primaryKeys: ['personId', 'favoriteId'],
   foreignKeys: [
     ForeignKey(
-        childColumns: ['personId'], parentColumns: ['id'], entity: Person),
+        childColumns: ['personId'],
+        parentColumns: ['id'],
+        entity: Person,
+        onUpdate: ForeignKeyAction.cascade,
+        onDelete: ForeignKeyAction.cascade),
     ForeignKey(
-        childColumns: ['favoriteId'], parentColumns: ['id'], entity: Favorite)
+      childColumns: ['favoriteId'],
+      parentColumns: ['id'],
+      entity: Favorite,
+      onUpdate: ForeignKeyAction.cascade,
+      onDelete: ForeignKeyAction.cascade,
+    )
   ],
 )
 class PersonFavorite {
