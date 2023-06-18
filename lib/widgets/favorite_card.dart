@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:map_launcher/map_launcher.dart';
 import 'package:provider/provider.dart';
 import 'package:stepbit/database/entities/favorite.dart';
 
@@ -30,6 +31,15 @@ class FavoriteCard extends StatelessWidget {
             Text(favorite.city),
           ],
         ),
+        onTap: () async {
+          final availableMaps = await MapLauncher.installedMaps;
+          if (availableMaps.isNotEmpty) {
+            await availableMaps.first.showMarker(
+              coords: Coords(favorite.lat, favorite.lng),
+              title: favorite.name,
+            );
+          }
+        },
       ),
     );
   }
