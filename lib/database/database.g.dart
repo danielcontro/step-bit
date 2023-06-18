@@ -228,6 +228,14 @@ class _$PersonFavoriteDao extends PersonFavoriteDao {
             (PersonFavorite item) => <String, Object?>{
                   'personId': item.personId,
                   'favoriteId': item.favoriteId
+                }),
+        _personFavoriteDeletionAdapter = DeletionAdapter(
+            database,
+            'PersonFavorite',
+            ['personId', 'favoriteId'],
+            (PersonFavorite item) => <String, Object?>{
+                  'personId': item.personId,
+                  'favoriteId': item.favoriteId
                 });
 
   final sqflite.DatabaseExecutor database;
@@ -237,6 +245,8 @@ class _$PersonFavoriteDao extends PersonFavoriteDao {
   final QueryAdapter _queryAdapter;
 
   final InsertionAdapter<PersonFavorite> _personFavoriteInsertionAdapter;
+
+  final DeletionAdapter<PersonFavorite> _personFavoriteDeletionAdapter;
 
   @override
   Future<List<Favorite>> findFavoritesByPersonId(int id) async {
@@ -250,5 +260,10 @@ class _$PersonFavoriteDao extends PersonFavoriteDao {
   Future<void> insertPersonFavorite(PersonFavorite personFavorite) async {
     await _personFavoriteInsertionAdapter.insert(
         personFavorite, OnConflictStrategy.abort);
+  }
+
+  @override
+  Future<void> deletePersonFavorite(PersonFavorite personFavorite) async {
+    await _personFavoriteDeletionAdapter.delete(personFavorite);
   }
 }

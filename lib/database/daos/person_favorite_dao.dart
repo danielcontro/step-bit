@@ -1,7 +1,6 @@
 import 'package:floor/floor.dart';
 
 import '../entities/favorite.dart';
-import '../entities/person.dart';
 import '../entities/person_favorite.dart';
 
 @dao
@@ -25,9 +24,9 @@ abstract class PersonFavoriteDao {
   @insert
   Future<void> insertPersonFavorite(PersonFavorite personFavorite);
 
-  /*@delete
+  @delete
   Future<void> deletePersonFavorite(PersonFavorite personFavorite);
 
-  @Update(onConflict: OnConflictStrategy.replace)
+  /*@Update(onConflict: OnConflictStrategy.replace)
   Future<void> updatePersonFavorite(PersonFavorite personFavorite);*/
 }
