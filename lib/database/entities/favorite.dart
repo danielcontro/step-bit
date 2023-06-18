@@ -1,5 +1,3 @@
-// entity/favorite.dart
-
 import 'package:floor/floor.dart';
 import 'package:flutter/material.dart';
 

@@ -1,4 +1,3 @@
-//joints
 import 'package:floor/floor.dart';
 
 import '../entities/favorite.dart';
@@ -12,19 +11,23 @@ abstract class PersonFavoriteDao {
     FROM PersonFavorite
     INNER JOIN Favorite ON Favorite.id = PersonFavorite.favoriteId
     WHERE personId = :id
-''')
+  ''')
   Future<List<Favorite>> findFavoritesByPersonId(int id);
 
-  @Query(
-      'SELECT Person.* FROM PersonFavorite INNER JOIN Person ON Person.id = PersonFavorite.personId WHERE favoriteId = :id')
-  Stream<List<Person>?> findPeopleByFavoriteId(int id);
+  /*@Query('''
+    SELECT Person.*
+    FROM PersonFavorite
+    INNER JOIN Person ON Person.id = PersonFavorite.personId
+    WHERE favoriteId = :id
+  ''')
+  Stream<List<Person>?> findPeopleByFavoriteId(int id);*/
 
   @insert
   Future<void> insertPersonFavorite(PersonFavorite personFavorite);
 
-  @delete
+  /*@delete
   Future<void> deletePersonFavorite(PersonFavorite personFavorite);
 
   @Update(onConflict: OnConflictStrategy.replace)
-  Future<void> updatePersonFavorite(PersonFavorite personFavorite);
+  Future<void> updatePersonFavorite(PersonFavorite personFavorite);*/
 }

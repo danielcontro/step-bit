@@ -1,5 +1,3 @@
-// entity/personFavorite.dart
-
 import 'package:floor/floor.dart';
 
 import 'favorite.dart';

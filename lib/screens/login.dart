@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:stepbit/screens/homepage.dart';
 
+import '../database/entities/person.dart';
+import '../repositories/database_repository.dart';
 import '../utils/api_client.dart';
 
 class Login extends StatefulWidget {
@@ -76,6 +79,8 @@ class LoginState extends State<Login> {
     }
     final result = await ApiClient.login(username, password);
     if (result && context.mounted) {
+      Provider.of<DatabaseRepository>(context, listen: false)
+          .addPersonIfNotPresent(Person(1, 'Luca'));
       Navigator.pushReplacement(
           context, MaterialPageRoute(builder: (context) => const HomePage()));
     } else if (context.mounted) {
