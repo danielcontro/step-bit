@@ -13,7 +13,7 @@ abstract class FavoriteDao {
   Stream<Favorite?> findFavoriteByPosition(double lat, double lng);
 
   @Query('SELECT * FROM Favorite WHERE name = :name')
-  Stream<Favorite?> findFavoriteByName(String name);
+  Future<Favorite?> findFavoriteByName(String name);
 
   @insert
   Future<void> insertFavorite(Favorite favorite);

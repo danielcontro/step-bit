@@ -113,25 +113,40 @@ class ViewPOI extends StatelessWidget {
     final city = await getCity();
     final id = const Uuid().v4();
     if (context.mounted) {
-      await Provider.of<DatabaseRepository>(context, listen: false)
-          .addNewFavorite(
-              Favorite(
-                id,
-                poi.getName(),
-                city ?? "",
-                poi.position.latitude,
-                poi.position.longitude,
-                poi.getStreet() ?? "",
-                poi.getType(),
-              ),
-              PersonFavorite(1, id));
-    }
-    if (context.mounted) {
-      ScaffoldMessenger.of(context)
-        ..removeCurrentSnackBar()
-        ..showSnackBar(
-          const SnackBar(content: Text('Added to favorites')),
-        );
+      final poiDB =
+          await Provider.of<DatabaseRepository>(context, listen: false)
+              .findFavoriteByName(poi.getName());
+      if (poiDB == null) {
+        if (context.mounted) {
+          await Provider.of<DatabaseRepository>(context, listen: false)
+              .addNewFavorite(
+                  Favorite(
+                    id,
+                    poi.getName(),
+                    city ?? "",
+                    poi.position.latitude,
+                    poi.position.longitude,
+                    poi.getStreet() ?? "",
+                    poi.getType(),
+                  ),
+                  PersonFavorite(1, id));
+          if (context.mounted) {
+            ScaffoldMessenger.of(context)
+              ..removeCurrentSnackBar()
+              ..showSnackBar(
+                const SnackBar(content: Text('Added to favorites')),
+              );
+          }
+        }
+      } else {
+        if (context.mounted) {
+          ScaffoldMessenger.of(context)
+            ..removeCurrentSnackBar()
+            ..showSnackBar(
+              const SnackBar(content: Text('Already added')),
+            );
+        }
+      }
     }
   }
 }

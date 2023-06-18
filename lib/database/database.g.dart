@@ -296,8 +296,8 @@ class _$FavoriteDao extends FavoriteDao {
   }
 
   @override
-  Stream<Favorite?> findFavoriteByName(String name) {
-    return _queryAdapter.queryStream('SELECT * FROM Favorite WHERE name = ?1',
+  Future<Favorite?> findFavoriteByName(String name) async {
+    return _queryAdapter.query('SELECT * FROM Favorite WHERE name = ?1',
         mapper: (Map<String, Object?> row) => Favorite(
             row['id'] as String,
             row['name'] as String,
@@ -306,9 +306,7 @@ class _$FavoriteDao extends FavoriteDao {
             row['lng'] as double,
             row['address'] as String?,
             row['type'] as String),
-        arguments: [name],
-        queryableName: 'Favorite',
-        isView: false);
+        arguments: [name]);
   }
 
   @override

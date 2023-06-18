@@ -10,9 +10,8 @@ class DatabaseRepository extends ChangeNotifier {
 
   DatabaseRepository({required this.database});
 
-  Future<List<Person>> findAllPeople() async {
-    final results = await database.personDao.findAllPeople();
-    return results;
+  Future<List<Person>> findAllPeople() {
+    return database.personDao.findAllPeople();
   }
 
   //This method wraps the insertPerson() method of the DAO.
@@ -39,5 +38,9 @@ class DatabaseRepository extends ChangeNotifier {
     await database.favoriteDao.insertFavorite(favorite);
     await database.personFavoriteDao.insertPersonFavorite(personFavorite);
     notifyListeners();
+  }
+
+  Future<Favorite?> findFavoriteByName(String name) {
+    return database.favoriteDao.findFavoriteByName(name);
   }
 }
