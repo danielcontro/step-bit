@@ -36,8 +36,6 @@ class DatabaseRepository extends ChangeNotifier {
 
   Future<void> deleteFavorite(Favorite favorite) async {
     await database.favoriteDao.deleteFavorite(favorite);
-    await database.personFavoriteDao
-        .deletePersonFavorite(PersonFavorite(1, favorite.id));
     notifyListeners();
   }
 
