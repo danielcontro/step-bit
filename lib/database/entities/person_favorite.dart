@@ -23,9 +23,7 @@ import 'person.dart';
   ],
 )
 class PersonFavorite {
-  @ColumnInfo(name: 'personId')
   final int personId;
-  @ColumnInfo(name: 'favoriteId')
   final String favoriteId;
 
   PersonFavorite(this.personId, this.favoriteId);

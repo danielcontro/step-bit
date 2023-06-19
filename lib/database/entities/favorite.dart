@@ -1,6 +1,6 @@
 import 'package:floor/floor.dart';
 
-@Entity(tableName: 'Favorite', primaryKeys: ['id'])
+@Entity(tableName: 'Favorite')
 class Favorite {
   @PrimaryKey()
   final String id;

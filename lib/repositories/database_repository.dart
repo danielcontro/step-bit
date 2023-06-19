@@ -10,22 +10,6 @@ class DatabaseRepository extends ChangeNotifier {
 
   DatabaseRepository({required this.database});
 
-  /*Future<List<Person>> findAllPeople() {
-    return database.personDao.findAllPeople();
-  }*/
-
-  //This method wraps the insertPerson() method of the DAO.
-  //Then, it notifies the listeners that something changed.
-  /*Future<void> insertPerson(Person person) async {
-    await database.personDao.insertPerson(person);
-    notifyListeners();
-  }*/
-
-  /*Future<void> updatePerson(Person person) async {
-    await database.personDao.updatePerson(person);
-    notifyListeners();
-  }*/
-
   Future<void> addPersonIfNotPresent(Person person) async {
     final personDB = await database.personDao.findPersonById(person.id);
     if (personDB == null) {
