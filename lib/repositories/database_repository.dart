@@ -14,8 +14,8 @@ class DatabaseRepository extends ChangeNotifier {
     final personDB = await database.personDao.findPersonById(person.id);
     if (personDB == null) {
       await database.personDao.insertPerson(person);
+      notifyListeners();
     }
-    notifyListeners();
   }
 
   Future<void> deleteFavorite(Favorite favorite) async {

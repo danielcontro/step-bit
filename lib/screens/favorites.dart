@@ -37,10 +37,11 @@ class Favorites extends StatelessWidget {
                       ),
                     );
                   } else {
-                    return ListView(
-                      scrollDirection: Axis.vertical,
-                      shrinkWrap: true,
+                    return const Expanded(
+                      child: Center(
+                          child: Text("Go to the map to add a new favorite")),
                     );
+                    ;
                   }
                 } else {
                   return const Loading();
