@@ -44,7 +44,7 @@ class StartActivity extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const UserGreeting(name: "Luca"),
+                  const UserGreeting(),
                   Text("Loading data...", style: textStyle),
                 ],
               ),
@@ -62,7 +62,7 @@ class StartActivity extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const UserGreeting(name: "Luca"),
+                const UserGreeting(),
                 AnimatedDigitWidget(
                   value: dailySteps,
                   textStyle: textStyle,

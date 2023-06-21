@@ -1,23 +1,39 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 import 'package:stepbit/screens/homepage.dart';
 import 'package:stepbit/screens/login.dart';
 import 'package:stepbit/utils/app_colors.dart';
 import 'package:stepbit/utils/app_interceptor.dart';
 import 'package:stepbit/utils/token_manager.dart';
 
+import 'database/database.dart';
+import 'repositories/database_repository.dart';
 import 'widgets/loading.dart';
 
-void main() {
+Future<void> main() async {
   // We need to call it manually,
   // because we going to call setPreferredOrientations()
   // before the runApp() call
   WidgetsFlutterBinding.ensureInitialized();
 
+  //This opens the database.
+  final AppDatabase database =
+      await $FloorAppDatabase.databaseBuilder('app_database.db').build();
+
+  //This creates a new DatabaseRepository from the AppDatabase instance just initialized
+  final databaseRepository = DatabaseRepository(database: database);
+
+  //const storage = FlutterSecureStorage();
+  //await storage.deleteAll();
+
   // Than we setup preferred orientations,
   // and only after it finished we run our app
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
-      .then((_) => runApp(const MyApp()));
+      .then((_) => runApp(ChangeNotifierProvider<DatabaseRepository>(
+            create: (context) => databaseRepository,
+            child: const MyApp(),
+          )));
 }
 
 class MyApp extends StatelessWidget {

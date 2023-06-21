@@ -50,7 +50,7 @@ class HomePageState extends State<HomePage> {
       body: PageView(
         controller: pageController,
         children: [
-          Favorites(data: selectedDistance),
+          const Favorites(),
           StartActivity(
             pageController: pageController,
             setDistanceCallback: setNewDistance,
