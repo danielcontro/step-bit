@@ -21,7 +21,7 @@ class Favorites extends StatelessWidget {
         Consumer<DatabaseRepository>(
           builder: (context, dbr, child) {
             return FutureBuilder<List<Favorite>>(
-              future: dbr.database.personFavoriteDao.findFavoritesByPersonId(1),
+              future: dbr.findFavoritesByPersonId(1),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   final favorites = snapshot.data!;
@@ -41,7 +41,6 @@ class Favorites extends StatelessWidget {
                       child: Center(
                           child: Text("Go to the map to add a new favorite")),
                     );
-                    ;
                   }
                 } else {
                   return const Loading();

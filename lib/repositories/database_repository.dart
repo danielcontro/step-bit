@@ -35,4 +35,8 @@ class DatabaseRepository extends ChangeNotifier {
   Future<Favorite?> findFavoriteByName(String name) {
     return database.favoriteDao.findFavoriteByName(name);
   }
+
+  Future<List<Favorite>> findFavoritesByPersonId(int id) {
+    return database.personFavoriteDao.findFavoritesByPersonId(id);
+  }
 }
