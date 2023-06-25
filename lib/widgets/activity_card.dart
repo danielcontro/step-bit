@@ -11,7 +11,7 @@ class ActivityCard extends StatelessWidget {
     return switch (exercise.activityName.toLowerCase()) {
       "running" => const Icon(Icons.directions_run),
       "walking" => const Icon(Icons.directions_walk),
-      "cycling" => const Icon(Icons.directions_bike),
+      "spinning" || "cycling" => const Icon(Icons.directions_bike),
       _ => const Icon(Icons.question_mark)
     };
   }
