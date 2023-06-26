@@ -15,7 +15,7 @@ class Exercise {
   final List<HeartRateZones> heartRateZones;
   final double? speed;
   final double? vO2Max;
-  final double elevationGain;
+  final double? elevationGain;
   final DateTime time;
 
   const Exercise(
@@ -61,7 +61,9 @@ class Exercise {
             : List.empty(),
         speed: double.tryParse(json["speed"].toString()),
         vO2Max: double.tryParse(["VO2Max"].toString()),
-        elevationGain: double.parse(json["elevationGain"].toString()),
+        elevationGain: json["elevationGain"] != null
+            ? double.parse(json["elevationGain"].toString())
+            : null,
         time: DateFormat('yyyy-MM-dd HH:mm:ss').parse('$date ${json["time"]}'));
   }
 

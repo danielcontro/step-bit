@@ -12,6 +12,7 @@ class ActivityCard extends StatelessWidget {
       "running" => const Icon(Icons.directions_run),
       "walking" => const Icon(Icons.directions_walk),
       "spinning" || "cycling" => const Icon(Icons.directions_bike),
+      "sport" => const Icon(Icons.sports_handball),
       _ => const Icon(Icons.question_mark)
     };
   }
