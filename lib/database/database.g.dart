@@ -239,11 +239,29 @@ class _$PersonFavoriteDao extends PersonFavoriteDao {
   final InsertionAdapter<PersonFavorite> _personFavoriteInsertionAdapter;
 
   @override
-  Future<List<Favorite>> findFavoritesByPersonId(int id) async {
+  Future<List<Favorite>> findFavoritesByPersonId(int personId) async {
     return _queryAdapter.queryList(
         'SELECT Favorite.*     FROM PersonFavorite     INNER JOIN Favorite ON Favorite.id = PersonFavorite.favoriteId     WHERE personId = ?1',
         mapper: (Map<String, Object?> row) => Favorite(row['id'] as String, row['name'] as String, row['city'] as String, row['lat'] as double, row['lng'] as double, row['address'] as String?, row['type'] as String),
-        arguments: [id]);
+        arguments: [personId]);
+  }
+
+  @override
+  Future<void> deletePersonFavoriteFromIds(
+    int personId,
+    String favoriteId,
+  ) async {
+    await _queryAdapter.queryNoReturn(
+        'DELETE FROM PersonFavorite     WHERE personId = ?1 AND favoriteId = ?2',
+        arguments: [personId, favoriteId]);
+  }
+
+  @override
+  Future<int?> numberOfEntriesFromFavoriteId(String favoriteId) async {
+    return _queryAdapter.query(
+        'SELECT COUNT(*)     FROM PersonFavorite     INNER JOIN Favorite ON Favorite.id = PersonFavorite.favoriteId     WHERE favoriteId = ?1',
+        mapper: (Map<String, Object?> row) => row.values.first as int,
+        arguments: [favoriteId]);
   }
 
   @override
