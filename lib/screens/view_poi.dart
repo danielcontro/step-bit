@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:map_launcher/map_launcher.dart';
 import 'package:provider/provider.dart';
+import 'package:qr_flutter/qr_flutter.dart';
 import 'package:stepbit/database/entities/favorite.dart';
 import 'package:stepbit/database/entities/person_favorite.dart';
 import 'package:stepbit/models/poi.dart';
@@ -13,7 +15,10 @@ import '../repositories/database_repository.dart';
 class ViewPOI extends StatelessWidget {
   final POI poi;
 
-  const ViewPOI({super.key, required this.poi});
+  const ViewPOI({
+    super.key,
+    required this.poi,
+  });
 
   Future<String?> getCity() async {
     if (poi.getCity() != null) {
@@ -47,63 +52,135 @@ class ViewPOI extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const textStyle = TextStyle(
-      fontSize: 20,
+    final topContentText = Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            POI.getIcon(poi.getType()),
+            const SizedBox(width: 10.0),
+            Text(poi.getType().capitalize()),
+          ],
+        ),
+        const SizedBox(
+          width: 90.0,
+          child: Divider(color: Colors.lime),
+        ),
+        const SizedBox(height: 10.0),
+        Text(
+          poi.getName(),
+          style: const TextStyle(fontSize: 45.0),
+        ),
+        const SizedBox(height: 30.0),
+        Padding(
+          padding: const EdgeInsets.only(left: 10.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Distance: ${poi.getDistanceKmOrMeters()}'),
+              getCityWidget(),
+              if (poi.getStreet() != null) Text('Street: ${poi.getStreet()}'),
+            ],
+          ),
+        ),
+      ],
     );
+
+    final topContent = Container(
+      height: MediaQuery.of(context).size.height * 0.40,
+      padding: const EdgeInsets.all(40.0),
+      width: MediaQuery.of(context).size.width,
+      decoration:
+          const BoxDecoration(color: Color.fromRGBO(116, 138, 77, 0.89)),
+      child: Center(
+        child: topContentText,
+      ),
+    );
+
+    final bottomContent = Container(
+      width: MediaQuery.of(context).size.width,
+      padding: const EdgeInsets.all(40.0),
+      child: Center(
+          child: Container(
+        color: Colors.white,
+        child: QrImageView(
+          data: "test",
+          version: QrVersions.auto,
+          size: 200.0,
+        ),
+      )
+          //       FutureBuilder<Widget>(
+          //       future: ,
+          //         builder: (context, snapshot) {
+          //           FloatingActionButton(
+          //               child: const Text("Request Discount"),
+          //               onPressed: () => (eligibleForDiscount ? () : null));
+
+          //         }
+          ),
+    );
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('Details'),
       ),
       body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[topContent, bottomContent],
+      ),
+      floatingActionButtonLocation: ExpandableFab.location,
+      floatingActionButton: ExpandableFab(
+        key: key,
+        type: ExpandableFabType.fan,
+        fanAngle: 90,
+        backgroundColor: Colors.lime,
+        closeButtonStyle: const ExpandableFabCloseButtonStyle(
+          backgroundColor: Colors.lime,
+        ),
+        child: const Icon(Icons.question_mark),
         children: [
-          Text(
-            poi.getName(),
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 40,
-            ),
-          ),
-          Row(children: [
-            const Text('Type: ', style: textStyle),
-            POI.getIcon(poi.getType()),
-            Text(' ${poi.getType().capitalize()}', style: textStyle),
-          ]),
-          Row(children: [
-            const Text('Distance: ', style: textStyle),
-            const Icon(Icons.timeline, size: 20),
-            Text(' ${poi.getDistanceKmOrMeters()}', style: textStyle),
-          ]),
-          getCityWidget(),
-          if (poi.getStreet() != null)
-            Text(
-              'Street: ${poi.getStreet()}',
-              style: textStyle,
-            ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              ElevatedButton(
-                onPressed: () async {
-                  final availableMaps = await MapLauncher.installedMaps;
-                  if (availableMaps.isNotEmpty) {
-                    await availableMaps.first.showMarker(
-                      coords: Coords(
-                        poi.position.latitude,
-                        poi.position.longitude,
-                      ),
-                      title: poi.getName(),
-                    );
-                  }
-                },
-                child: const Text("View on the map"),
-              ),
-              ElevatedButton(
-                onPressed: () => _addFavorite(context),
-                child: const Text("Add to favorites"),
-              ),
-            ],
-          ),
+          FutureBuilder<Favorite?>(
+              future: Provider.of<DatabaseRepository>(context, listen: true)
+                  .findFavoriteByName(poi.getName()),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState != ConnectionState.done) {
+                  // while data is loading:
+                  return const CircularProgressIndicator();
+                }
+                // data loaded:
+                var isFavorite = true;
+                final favorite = snapshot.data;
+                if (favorite == null) {
+                  isFavorite = false;
+                }
+                return FloatingActionButton.small(
+                  heroTag: null,
+                  backgroundColor: Colors.lime,
+                  child: isFavorite
+                      ? const Icon(Icons.favorite_border)
+                      : const Icon(Icons.favorite),
+                  onPressed: () => isFavorite
+                      ? _removeFavorite(context, favorite!)
+                      : _addFavorite(context),
+                );
+              }),
+          FloatingActionButton.small(
+            heroTag: null,
+            backgroundColor: Colors.lime,
+            child: const Icon(Icons.map),
+            onPressed: () async {
+              final availableMaps = await MapLauncher.installedMaps;
+              if (availableMaps.isNotEmpty) {
+                await availableMaps.first.showMarker(
+                  coords: Coords(
+                    poi.position.latitude,
+                    poi.position.longitude,
+                  ),
+                  title: poi.getName(),
+                );
+              }
+            },
+          )
         ],
       ),
     );
@@ -146,6 +223,20 @@ class ViewPOI extends StatelessWidget {
               const SnackBar(content: Text('Already added')),
             );
         }
+      }
+    }
+  }
+
+  void _removeFavorite(BuildContext context, Favorite favorite) async {
+    if (context.mounted) {
+      await Provider.of<DatabaseRepository>(context, listen: false)
+          .deleteFavorite(1, favorite);
+      if (context.mounted) {
+        ScaffoldMessenger.of(context)
+          ..removeCurrentSnackBar()
+          ..showSnackBar(
+            const SnackBar(content: Text('Removed from favorites')),
+          );
       }
     }
   }

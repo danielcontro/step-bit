@@ -4,7 +4,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:provider/provider.dart';
 import 'package:stepbit/models/poi.dart';
+import 'package:stepbit/repositories/database_repository.dart';
 import 'package:stepbit/screens/view_poi.dart';
 import 'package:stepbit/utils/position.dart';
 import 'package:stepbit/widgets/loading.dart';
@@ -36,8 +38,12 @@ class _MapState extends State<MapWidget> {
         title: poi.getName(),
         snippet: 'Tap to view details',
         onTap: () {
-          Navigator.push(context,
-              MaterialPageRoute(builder: (context) => ViewPOI(poi: poi)));
+          Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) => ViewPOI(
+                        poi: poi,
+                      )));
         },
       ),
     );
@@ -64,7 +70,7 @@ class _MapState extends State<MapWidget> {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<LatLng?>(
-      future: getCurrentPosition(),
+      future: Position.getCurrentPosition(),
       builder: (context, snapshot) {
         if (!snapshot.hasData) {
           // while data is loading:
