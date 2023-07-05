@@ -9,18 +9,18 @@ abstract class PersonFavoriteDao {
     SELECT Favorite.*
     FROM PersonFavorite
     INNER JOIN Favorite ON Favorite.id = PersonFavorite.favoriteId
-    WHERE personId = :personId
+    WHERE personUsername = :username
   ''')
-  Future<List<Favorite>> findFavoritesByPersonId(int personId);
+  Future<List<Favorite>> findFavoritesByPersonUsername(String username);
 
   @insert
   Future<void> insertPersonFavorite(PersonFavorite personFavorite);
 
   @Query('''
     DELETE FROM PersonFavorite
-    WHERE personId = :personId AND favoriteId = :favoriteId
+    WHERE personUsername = :username AND favoriteId = :favoriteId
   ''')
-  Future<void> deletePersonFavoriteFromIds(int personId, String favoriteId);
+  Future<void> deletePersonFavoriteFromIds(String username, String favoriteId);
 
   @Query('''
     SELECT COUNT(*)

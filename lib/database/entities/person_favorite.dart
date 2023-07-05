@@ -8,8 +8,8 @@ import 'person.dart';
   primaryKeys: ['personId', 'favoriteId'],
   foreignKeys: [
     ForeignKey(
-        childColumns: ['personId'],
-        parentColumns: ['id'],
+        childColumns: ['personUsername'],
+        parentColumns: ['username'],
         entity: Person,
         onUpdate: ForeignKeyAction.cascade,
         onDelete: ForeignKeyAction.cascade),
@@ -23,8 +23,8 @@ import 'person.dart';
   ],
 )
 class PersonFavorite {
-  final int personId;
+  final String personUsername;
   final String favoriteId;
 
-  PersonFavorite(this.personId, this.favoriteId);
+  PersonFavorite(this.personUsername, this.favoriteId);
 }

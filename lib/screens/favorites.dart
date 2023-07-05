@@ -4,10 +4,17 @@ import 'package:stepbit/database/entities/favorite.dart';
 import 'package:stepbit/widgets/loading.dart';
 
 import '../repositories/database_repository.dart';
+import '../utils/token_manager.dart';
 import '../widgets/favorite_card.dart';
 
 class Favorites extends StatelessWidget {
   const Favorites({Key? key}) : super(key: key);
+
+  Future<List<Favorite>> findFavoritesByPersonUsername(
+      DatabaseRepository dbr) async {
+    final username = await TokenManager.getUsername();
+    return dbr.findFavoritesByPersonUsername(username!);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,7 +28,7 @@ class Favorites extends StatelessWidget {
         Consumer<DatabaseRepository>(
           builder: (context, dbr, child) {
             return FutureBuilder<List<Favorite>>(
-              future: dbr.findFavoritesByPersonId(1),
+              future: findFavoritesByPersonUsername(dbr),
               builder: (context, snapshot) {
                 if (snapshot.hasData) {
                   final favorites = snapshot.data!;

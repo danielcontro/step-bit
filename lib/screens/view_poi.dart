@@ -8,6 +8,7 @@ import 'package:stepbit/database/entities/favorite.dart';
 import 'package:stepbit/database/entities/person_favorite.dart';
 import 'package:stepbit/models/poi.dart';
 import 'package:stepbit/utils/extension_methods.dart';
+import 'package:stepbit/utils/token_manager.dart';
 import 'package:uuid/uuid.dart';
 
 import '../repositories/database_repository.dart';
@@ -203,7 +204,7 @@ class ViewPOI extends StatelessWidget {
                     poi.getStreet() ?? "",
                     poi.getType(),
                   ),
-                  PersonFavorite(1, id));
+                  PersonFavorite((await TokenManager.getUsername())!, id));
           if (context.mounted) {
             ScaffoldMessenger.of(context)
               ..removeCurrentSnackBar()
@@ -227,7 +228,7 @@ class ViewPOI extends StatelessWidget {
   void _removeFavorite(BuildContext context, Favorite favorite) async {
     if (context.mounted) {
       await Provider.of<DatabaseRepository>(context, listen: false)
-          .deleteFavorite(1, favorite);
+          .deleteFavorite((await TokenManager.getUsername())!, favorite);
       if (context.mounted) {
         ScaffoldMessenger.of(context)
           ..removeCurrentSnackBar()

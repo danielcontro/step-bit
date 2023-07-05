@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:stepbit/database/entities/favorite.dart';
 import 'package:stepbit/models/poi.dart';
 import 'package:stepbit/utils/position.dart';
+import 'package:stepbit/utils/token_manager.dart';
 
 import '../repositories/database_repository.dart';
 import '../screens/view_poi.dart';
@@ -23,7 +24,7 @@ class FavoriteCard extends StatelessWidget {
       ),
       onDismissed: (direction) async {
         await Provider.of<DatabaseRepository>(context, listen: false)
-            .deleteFavorite(1, favorite);
+            .deleteFavorite((await TokenManager.getUsername())!, favorite);
       },
       child: ListTile(
         leading: POI.getIcon(favorite.type),
