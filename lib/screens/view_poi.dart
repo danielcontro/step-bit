@@ -39,10 +39,7 @@ class ViewPOI extends StatelessWidget {
       builder: (context, snapshot) {
         if (snapshot.hasData) {
           final locality = snapshot.data as String;
-          return Text(
-            'City: $locality',
-            style: const TextStyle(fontSize: 20),
-          );
+          return Text('City: $locality');
         } else {
           return const Text('');
         }
