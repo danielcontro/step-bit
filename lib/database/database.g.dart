@@ -89,7 +89,7 @@ class _$AppDatabase extends AppDatabase {
       },
       onCreate: (database, version) async {
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `Person` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL)');
+            'CREATE TABLE IF NOT EXISTS `Person` (`username` TEXT NOT NULL, `name` TEXT NOT NULL, `birthYear` INTEGER NOT NULL, PRIMARY KEY (`username`))');
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `Favorite` (`id` TEXT NOT NULL, `name` TEXT NOT NULL, `city` TEXT NOT NULL, `lat` REAL NOT NULL, `lng` REAL NOT NULL, `address` TEXT, `type` TEXT NOT NULL, PRIMARY KEY (`id`))');
         await database.execute(
@@ -126,8 +126,11 @@ class _$PersonDao extends PersonDao {
         _personInsertionAdapter = InsertionAdapter(
             database,
             'Person',
-            (Person item) =>
-                <String, Object?>{'id': item.id, 'name': item.name});
+            (Person item) => <String, Object?>{
+                  'username': item.username,
+                  'name': item.name,
+                  'birthYear': item.birthYear
+                });
 
   final sqflite.DatabaseExecutor database;
 
@@ -138,11 +141,11 @@ class _$PersonDao extends PersonDao {
   final InsertionAdapter<Person> _personInsertionAdapter;
 
   @override
-  Future<Person?> findPersonById(int id) async {
-    return _queryAdapter.query('SELECT * FROM Person WHERE id = ?1',
-        mapper: (Map<String, Object?> row) =>
-            Person(row['id'] as int, row['name'] as String),
-        arguments: [id]);
+  Future<Person?> findPersonByUsername(String username) async {
+    return _queryAdapter.query('SELECT * FROM Person WHERE username = ?1',
+        mapper: (Map<String, Object?> row) => Person(row['username'] as String,
+            row['name'] as String, row['birthYear'] as int),
+        arguments: [username]);
   }
 
   @override

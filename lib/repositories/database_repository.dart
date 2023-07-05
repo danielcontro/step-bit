@@ -11,7 +11,8 @@ class DatabaseRepository extends ChangeNotifier {
   DatabaseRepository({required this.database});
 
   Future<void> addPersonIfNotPresent(Person person) async {
-    final personDB = await database.personDao.findPersonById(person.id);
+    final personDB =
+        await database.personDao.findPersonByUsername(person.username);
     if (personDB == null) {
       await database.personDao.insertPerson(person);
       notifyListeners();

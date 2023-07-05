@@ -49,8 +49,8 @@ class OverpassApi {
           .where((poi) => poi.distanceInKm * 1000 > distance - distance * 0.2)
           .toList();
 
-      print("POI: ${results.length}");
-      print("POI filtered: ${results20perc.length}");
+      //print("POI: ${results.length}");
+      //print("POI filtered: ${results20perc.length}");
 
       if (results20perc.length < 5) {
         results.sort((a, b) => a.distanceInKm.compareTo(b.distanceInKm));

@@ -37,7 +37,7 @@ class _QuantityInput extends State<QuantityInput> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          "How much do you want to walk?",
+          'How much do you want to move?',
           textAlign: TextAlign.center,
           style: TextStyle(
             fontSize: 22,

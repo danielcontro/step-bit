@@ -54,7 +54,7 @@ class MyApp extends StatelessWidget {
           builder: (context, snapshot) {
             if (snapshot.hasData) {
               final showLogin = snapshot.data as bool;
-              return showLogin || forceLoginForm
+              return forceLoginForm || showLogin
                   ? const Login()
                   : const HomePage();
             } else {

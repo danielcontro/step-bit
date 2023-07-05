@@ -5,11 +5,12 @@ import 'package:stepbit/utils/token_manager.dart';
 
 import '../models/distance.dart';
 import '../models/exercise.dart';
+import '../models/patient.dart';
 import '../models/steps.dart';
 
 class ApiClient {
-  static const _patientUsername = 'Jpefaq6m58';
   static const _tokenEndpoint = 'gate/v1/token/';
+  static const _patientsEndpoint = 'study/v1/patients/';
 
   static final _client = AppInterceptor().dio;
 
@@ -24,12 +25,26 @@ class ApiClient {
     });
   }
 
-  static Future<List<Steps>?> getSteps(DateTime date) {
+  static Future<List<Patient>?> patients() {
+    return _client.get(_patientsEndpoint).then((value) async {
+      if (value.statusCode != HttpStatus.ok) {
+        return null;
+      }
+      final data = value.data['data'];
+      return data
+          .cast<Map<String, dynamic>>()
+          .map<Patient>((json) => Patient.fromJson(json))
+          .toList();
+    });
+  }
+
+  static Future<List<Steps>?> getSteps(DateTime date) async {
     var newFormat = DateFormat('y-MM-dd');
     final dateFormatted = newFormat.format(date);
+    final patientUsername = await TokenManager.getUsername();
 
     return _client
-        .get('data/v1/steps/patients/$_patientUsername/day/$dateFormatted/')
+        .get('data/v1/steps/patients/$patientUsername/day/$dateFormatted/')
         .then((value) {
       if (value.statusCode != HttpStatus.ok) {
         return null;
@@ -46,12 +61,13 @@ class ApiClient {
     });
   }
 
-  static Future<List<Distance>?> getDistance(DateTime date) {
+  static Future<List<Distance>?> getDistance(DateTime date) async {
     var newFormat = DateFormat('y-MM-dd');
     final dateFormatted = newFormat.format(date);
+    final patientUsername = await TokenManager.getUsername();
 
     return _client
-        .get('data/v1/distance/patients/$_patientUsername/day/$dateFormatted/')
+        .get('data/v1/distance/patients/$patientUsername/day/$dateFormatted/')
         .then((value) {
       if (value.statusCode != HttpStatus.ok) {
         return null;
@@ -64,12 +80,13 @@ class ApiClient {
     });
   }
 
-  static Future<List<Exercise>?> getExercises(DateTime date) {
+  static Future<List<Exercise>?> getExercises(DateTime date) async {
     var newFormat = DateFormat('y-MM-dd');
     final dateFormatted = newFormat.format(date);
+    final patientUsername = await TokenManager.getUsername();
 
     return _client
-        .get('data/v1/exercise/patients/$_patientUsername/day/$dateFormatted/')
+        .get('data/v1/exercise/patients/$patientUsername/day/$dateFormatted/')
         .then((value) {
       if (value.statusCode != HttpStatus.ok) {
         return null;
@@ -83,14 +100,15 @@ class ApiClient {
   }
 
   static Future<List<Exercise>?> getExercisesStartEnd(
-      DateTime startDate, DateTime endDate) {
+      DateTime startDate, DateTime endDate) async {
     var newFormat = DateFormat('y-MM-dd');
     final startDateFormatted = newFormat.format(startDate);
     final endDateFormatted = newFormat.format(endDate);
+    final patientUsername = await TokenManager.getUsername();
 
     return _client
         .get(
-            'data/v1/exercise/patients/$_patientUsername/daterange/start_date/$startDateFormatted/end_date/$endDateFormatted/')
+            'data/v1/exercise/patients/$patientUsername/daterange/start_date/$startDateFormatted/end_date/$endDateFormatted/')
         .then((value) {
       if (value.statusCode != HttpStatus.ok) {
         return null;

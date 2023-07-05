@@ -15,8 +15,8 @@ class AppInterceptor {
         .add(InterceptorsWrapper(onRequest: (options, handler) async {
       final accessToken = await TokenManager.getAccessToken();
       if (accessToken != null) {
-        options.headers
-            .putIfAbsent('Authorization', () => 'Bearer $accessToken');
+        options.headers.putIfAbsent(
+            HttpHeaders.authorizationHeader, () => 'Bearer $accessToken');
       }
       handler.next(options);
     }, onError: (err, handler) async {
@@ -26,7 +26,8 @@ class AppInterceptor {
 
         final accessToken = await TokenManager.getAccessToken();
         if (accessToken != null) {
-          err.requestOptions.headers['Authorization'] = 'Bearer $accessToken';
+          err.requestOptions.headers[HttpHeaders.authorizationHeader] =
+              'Bearer $accessToken';
         }
 
         final opts = Options(
