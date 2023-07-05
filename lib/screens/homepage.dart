@@ -13,8 +13,8 @@ class HomePage extends StatefulWidget {
 }
 
 class HomePageState extends State<HomePage> {
-  int selectedIndex = 1;
-  final pageController = PageController(initialPage: 1);
+  int selectedIndex = 2;
+  final pageController = PageController(initialPage: 2);
 
   double selectedDistance = 1;
   void setNewDistance(double newDistance) {
