@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:stepbit/screens/deals.dart';
 import 'package:stepbit/screens/favorites.dart';
 import 'package:stepbit/screens/map.dart';
+import 'package:stepbit/screens/settings.dart';
 import 'package:stepbit/screens/start_activity.dart';
 import 'package:stepbit/utils/app_colors.dart';
 
@@ -26,6 +27,13 @@ class HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('StepBit', style: TextStyle(fontSize: 30)),
+        leading: IconButton(
+          icon: const Icon(Icons.settings),
+          onPressed: () {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => const Settings()));
+          },
+        ),
       ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[

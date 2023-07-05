@@ -1,3 +1,4 @@
+import 'package:easy_settings/easy_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -9,6 +10,7 @@ import 'package:stepbit/utils/token_manager.dart';
 
 import 'database/database.dart';
 import 'repositories/database_repository.dart';
+import 'screens/settings.dart';
 import 'widgets/loading.dart';
 
 Future<void> main() async {
@@ -30,10 +32,13 @@ Future<void> main() async {
   // Than we setup preferred orientations,
   // and only after it finished we run our app
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp])
-      .then((_) => runApp(ChangeNotifierProvider<DatabaseRepository>(
-            create: (context) => databaseRepository,
-            child: const MyApp(),
-          )));
+      .then((_) async {
+    await initializeSettings(settingsCategories);
+    return runApp(ChangeNotifierProvider<DatabaseRepository>(
+      create: (context) => databaseRepository,
+      child: const MyApp(),
+    ));
+  });
 }
 
 class MyApp extends StatelessWidget {
