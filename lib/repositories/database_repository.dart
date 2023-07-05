@@ -19,8 +19,15 @@ class DatabaseRepository extends ChangeNotifier {
     }
   }
 
-  Future<void> deleteFavorite(Favorite favorite) async {
-    await database.favoriteDao.deleteFavorite(favorite);
+  Future<void> deleteFavorite(int personId, Favorite favorite) async {
+    await database.personFavoriteDao
+        .deletePersonFavoriteFromIds(personId, favorite.id);
+
+    if ((await database.personFavoriteDao
+            .numberOfEntriesFromFavoriteId(favorite.id)) ==
+        0) {
+      await database.favoriteDao.deleteFavorite(favorite);
+    }
     notifyListeners();
   }
 
@@ -35,6 +42,12 @@ class DatabaseRepository extends ChangeNotifier {
 
   Future<Favorite?> findFavoriteByName(String name) {
     return database.favoriteDao.findFavoriteByName(name);
+  }
+
+  Future<bool?> isFavorite(String name) {
+    return database.favoriteDao
+        .findFavoriteByName(name)
+        .then((value) => value == null ? false : true);
   }
 
   Future<List<Favorite>> findFavoritesByPersonId(int id) {

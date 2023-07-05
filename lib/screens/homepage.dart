@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:stepbit/screens/deals.dart';
 import 'package:stepbit/screens/favorites.dart';
 import 'package:stepbit/screens/map.dart';
 import 'package:stepbit/screens/start_activity.dart';
@@ -29,6 +30,10 @@ class HomePageState extends State<HomePage> {
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
+            icon: Icon(Icons.discount),
+            label: 'Deals',
+          ),
+          BottomNavigationBarItem(
             icon: Icon(Icons.favorite),
             label: 'Favorites',
           ),
@@ -50,6 +55,7 @@ class HomePageState extends State<HomePage> {
       body: PageView(
         controller: pageController,
         children: [
+          const Deals(),
           const Favorites(),
           StartActivity(
             pageController: pageController,
