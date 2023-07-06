@@ -30,6 +30,7 @@ dependencies:
   qr_flutter: ^4.1.0
   easy_settings: ^1.0.0
   property_change_notifier: ^0.3.0
+  http: ^1.1.0
 
 
 dev_dependencies:

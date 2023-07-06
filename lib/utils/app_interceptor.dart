@@ -6,11 +6,11 @@ import 'package:stepbit/utils/token_manager.dart';
 
 class AppInterceptor {
   var dio = Dio();
-  static const _baseUrl = 'https://impact.dei.unipd.it/bwthw/';
+  static const baseUrl = 'https://impact.dei.unipd.it/bwthw/';
   static const _refreshEndpoint = 'gate/v1/refresh/';
 
   AppInterceptor() {
-    dio.options = BaseOptions(baseUrl: _baseUrl);
+    dio.options = BaseOptions(baseUrl: baseUrl);
     dio.interceptors
         .add(InterceptorsWrapper(onRequest: (options, handler) async {
       final accessToken = await TokenManager.getAccessToken();

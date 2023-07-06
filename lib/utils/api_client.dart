@@ -1,7 +1,9 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:intl/intl.dart';
 import 'package:stepbit/utils/app_interceptor.dart';
 import 'package:stepbit/utils/token_manager.dart';
+import 'package:http/http.dart' as http;
 
 import '../models/distance.dart';
 import '../models/exercise.dart';
@@ -14,15 +16,16 @@ class ApiClient {
 
   static final _client = AppInterceptor().dio;
 
-  static Future<bool> login(String username, String password) {
+  static Future<bool> login(String username, String password) async {
     final body = {'username': username, 'password': password};
-    return _client.post(_tokenEndpoint, data: body).then((value) async {
-      if (value.statusCode == HttpStatus.ok) {
-        await TokenManager.saveTokens(value.data);
-        return true;
-      }
-      return false;
-    });
+    const url = AppInterceptor.baseUrl + _tokenEndpoint;
+    final response = await http.post(Uri.parse(url), body: body);
+    if (response.statusCode == HttpStatus.ok) {
+      final decodedResponse = jsonDecode(response.body);
+      await TokenManager.saveTokens(decodedResponse);
+      return true;
+    }
+    return false;
   }
 
   static Future<List<Patient>?> patients() {
