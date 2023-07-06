@@ -1,9 +1,11 @@
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:jwt_decoder/jwt_decoder.dart';
+import 'package:stepbit/models/patient.dart';
 
 class TokenManager {
   static const _accessToken = 'access_token';
   static const _refreshToken = 'refresh_token';
+  static const _username = 'username';
 
   static const _storage = FlutterSecureStorage();
 
@@ -12,7 +14,7 @@ class TokenManager {
   static Future<String?> getRefreshToken() => _storage.read(key: _refreshToken);
 
   static Future<void> saveTokens(Map<String, dynamic> json) async {
-    print("Token refreshed");
+    //print("Token refreshed");
     await _storage.write(key: _accessToken, value: json['access']);
     await _storage.write(key: _refreshToken, value: json['refresh']);
   }
@@ -28,10 +30,10 @@ class TokenManager {
       return true;
     }
     final isExpired = JwtDecoder.isExpired(accessToken);
-    if (!isExpired) {
+    /*if (!isExpired) {
       final seconds = JwtDecoder.getRemainingTime(accessToken).inSeconds;
       print("The access token is still valid for $seconds seconds");
-    }
+    }*/
     return isExpired;
   }
 
@@ -41,10 +43,16 @@ class TokenManager {
       return true;
     }
     final isExpired = JwtDecoder.isExpired(refreshToken);
-    if (!isExpired) {
+    /*if (!isExpired) {
       final seconds = JwtDecoder.getRemainingTime(refreshToken).inSeconds;
       print("The refresh token is still valid for $seconds seconds");
-    }
+    }*/
     return isExpired;
   }
+
+  static Future<void> saveUsername(Patient patient) async {
+    await _storage.write(key: _username, value: patient.username);
+  }
+
+  static Future<String?> getUsername() => _storage.read(key: _username);
 }

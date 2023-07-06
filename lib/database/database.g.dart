@@ -89,11 +89,11 @@ class _$AppDatabase extends AppDatabase {
       },
       onCreate: (database, version) async {
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `Person` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL)');
+            'CREATE TABLE IF NOT EXISTS `Person` (`username` TEXT NOT NULL, `name` TEXT NOT NULL, `birthYear` INTEGER NOT NULL, PRIMARY KEY (`username`))');
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `Favorite` (`id` TEXT NOT NULL, `name` TEXT NOT NULL, `city` TEXT NOT NULL, `lat` REAL NOT NULL, `lng` REAL NOT NULL, `address` TEXT, `type` TEXT NOT NULL, PRIMARY KEY (`id`))');
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `PersonFavorite` (`personId` INTEGER NOT NULL, `favoriteId` TEXT NOT NULL, FOREIGN KEY (`personId`) REFERENCES `Person` (`id`) ON UPDATE CASCADE ON DELETE CASCADE, FOREIGN KEY (`favoriteId`) REFERENCES `Favorite` (`id`) ON UPDATE CASCADE ON DELETE CASCADE, PRIMARY KEY (`personId`, `favoriteId`))');
+            'CREATE TABLE IF NOT EXISTS `PersonFavorite` (`personUsername` TEXT NOT NULL, `favoriteId` TEXT NOT NULL, FOREIGN KEY (`personUsername`) REFERENCES `Person` (`username`) ON UPDATE CASCADE ON DELETE CASCADE, FOREIGN KEY (`favoriteId`) REFERENCES `Favorite` (`id`) ON UPDATE CASCADE ON DELETE CASCADE, PRIMARY KEY (`favoriteId`))');
 
         await callback?.onCreate?.call(database, version);
       },
@@ -126,8 +126,11 @@ class _$PersonDao extends PersonDao {
         _personInsertionAdapter = InsertionAdapter(
             database,
             'Person',
-            (Person item) =>
-                <String, Object?>{'id': item.id, 'name': item.name});
+            (Person item) => <String, Object?>{
+                  'username': item.username,
+                  'name': item.name,
+                  'birthYear': item.birthYear
+                });
 
   final sqflite.DatabaseExecutor database;
 
@@ -138,11 +141,11 @@ class _$PersonDao extends PersonDao {
   final InsertionAdapter<Person> _personInsertionAdapter;
 
   @override
-  Future<Person?> findPersonById(int id) async {
-    return _queryAdapter.query('SELECT * FROM Person WHERE id = ?1',
-        mapper: (Map<String, Object?> row) =>
-            Person(row['id'] as int, row['name'] as String),
-        arguments: [id]);
+  Future<Person?> findPersonByUsername(String username) async {
+    return _queryAdapter.query('SELECT * FROM Person WHERE username = ?1',
+        mapper: (Map<String, Object?> row) => Person(row['username'] as String,
+            row['name'] as String, row['birthYear'] as int),
+        arguments: [username]);
   }
 
   @override
@@ -226,7 +229,7 @@ class _$PersonFavoriteDao extends PersonFavoriteDao {
             database,
             'PersonFavorite',
             (PersonFavorite item) => <String, Object?>{
-                  'personId': item.personId,
+                  'personUsername': item.personUsername,
                   'favoriteId': item.favoriteId
                 });
 
@@ -239,21 +242,21 @@ class _$PersonFavoriteDao extends PersonFavoriteDao {
   final InsertionAdapter<PersonFavorite> _personFavoriteInsertionAdapter;
 
   @override
-  Future<List<Favorite>> findFavoritesByPersonId(int personId) async {
+  Future<List<Favorite>> findFavoritesByPersonUsername(String username) async {
     return _queryAdapter.queryList(
-        'SELECT Favorite.*     FROM PersonFavorite     INNER JOIN Favorite ON Favorite.id = PersonFavorite.favoriteId     WHERE personId = ?1',
+        'SELECT Favorite.*     FROM PersonFavorite     INNER JOIN Favorite ON Favorite.id = PersonFavorite.favoriteId     WHERE personUsername = ?1',
         mapper: (Map<String, Object?> row) => Favorite(row['id'] as String, row['name'] as String, row['city'] as String, row['lat'] as double, row['lng'] as double, row['address'] as String?, row['type'] as String),
-        arguments: [personId]);
+        arguments: [username]);
   }
 
   @override
   Future<void> deletePersonFavoriteFromIds(
-    int personId,
+    String username,
     String favoriteId,
   ) async {
     await _queryAdapter.queryNoReturn(
-        'DELETE FROM PersonFavorite     WHERE personId = ?1 AND favoriteId = ?2',
-        arguments: [personId, favoriteId]);
+        'DELETE FROM PersonFavorite     WHERE personUsername = ?1 AND favoriteId = ?2',
+        arguments: [username, favoriteId]);
   }
 
   @override

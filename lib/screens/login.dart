@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:stepbit/screens/homepage.dart';
+import 'package:stepbit/utils/token_manager.dart';
 
 import '../database/entities/person.dart';
 import '../repositories/database_repository.dart';
@@ -61,7 +62,20 @@ class LoginState extends State<Login> {
                   onPressed: () async {
                     if (formKey.currentState!.validate()) {
                       formKey.currentState!.save();
-                      await login(context, _username!, _password!);
+                      final success =
+                          await login(context, _username!, _password!);
+                      if (success && context.mounted) {
+                        Navigator.pushReplacement(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const HomePage()));
+                      } else if (context.mounted) {
+                        ScaffoldMessenger.of(context)
+                          ..removeCurrentSnackBar()
+                          ..showSnackBar(
+                            const SnackBar(content: Text('Invalid credential')),
+                          );
+                      }
                     }
                   })
             ]),
@@ -69,26 +83,31 @@ class LoginState extends State<Login> {
         ));
   }
 
-  Future<void> login(
+  Future<bool> login(
     BuildContext context,
     String username,
     String password,
   ) async {
     if (username.isEmpty || password.isEmpty) {
-      return;
+      return false;
     }
     final result = await ApiClient.login(username, password);
-    if (result && context.mounted) {
-      Provider.of<DatabaseRepository>(context, listen: false)
-          .addPersonIfNotPresent(Person(1, 'Luca'));
-      Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => const HomePage()));
-    } else if (context.mounted) {
-      ScaffoldMessenger.of(context)
-        ..removeCurrentSnackBar()
-        ..showSnackBar(
-          const SnackBar(content: Text('Invalid credential')),
-        );
+    if (result) {
+      final patients = await ApiClient.patients();
+      if (patients == null) {
+        return false;
+      }
+      final myPatient = patients.first;
+      await TokenManager.saveUsername(myPatient);
+      if (context.mounted) {
+        Provider.of<DatabaseRepository>(context, listen: false)
+            .addPersonIfNotPresent(Person(
+          myPatient.username,
+          myPatient.displayName,
+          myPatient.birthYear,
+        ));
+      }
     }
+    return result;
   }
 }

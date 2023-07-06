@@ -6,8 +6,8 @@ import '../entities/person.dart';
 
 @dao
 abstract class PersonDao {
-  @Query('SELECT * FROM Person WHERE id = :id')
-  Future<Person?> findPersonById(int id);
+  @Query('SELECT * FROM Person WHERE username = :username')
+  Future<Person?> findPersonByUsername(String username);
 
   @insert
   Future<void> insertPerson(Person person);

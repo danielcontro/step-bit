@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:stepbit/screens/deals.dart';
 import 'package:stepbit/screens/favorites.dart';
 import 'package:stepbit/screens/map.dart';
+import 'package:stepbit/screens/settings.dart';
 import 'package:stepbit/screens/start_activity.dart';
 import 'package:stepbit/utils/app_colors.dart';
 
@@ -13,8 +14,8 @@ class HomePage extends StatefulWidget {
 }
 
 class HomePageState extends State<HomePage> {
-  int selectedIndex = 1;
-  final pageController = PageController(initialPage: 1);
+  int selectedIndex = 2;
+  final pageController = PageController(initialPage: 2);
 
   double selectedDistance = 1;
   void setNewDistance(double newDistance) {
@@ -26,6 +27,13 @@ class HomePageState extends State<HomePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('StepBit', style: TextStyle(fontSize: 30)),
+        leading: IconButton(
+          icon: const Icon(Icons.settings),
+          onPressed: () {
+            Navigator.push(context,
+                MaterialPageRoute(builder: (context) => const Settings()));
+          },
+        ),
       ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[

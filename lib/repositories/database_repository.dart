@@ -11,16 +11,17 @@ class DatabaseRepository extends ChangeNotifier {
   DatabaseRepository({required this.database});
 
   Future<void> addPersonIfNotPresent(Person person) async {
-    final personDB = await database.personDao.findPersonById(person.id);
+    final personDB =
+        await database.personDao.findPersonByUsername(person.username);
     if (personDB == null) {
       await database.personDao.insertPerson(person);
       notifyListeners();
     }
   }
 
-  Future<void> deleteFavorite(int personId, Favorite favorite) async {
+  Future<void> deleteFavorite(String username, Favorite favorite) async {
     await database.personFavoriteDao
-        .deletePersonFavoriteFromIds(personId, favorite.id);
+        .deletePersonFavoriteFromIds(username, favorite.id);
 
     if ((await database.personFavoriteDao
             .numberOfEntriesFromFavoriteId(favorite.id)) ==
@@ -49,7 +50,7 @@ class DatabaseRepository extends ChangeNotifier {
         .then((value) => value == null ? false : true);
   }
 
-  Future<List<Favorite>> findFavoritesByPersonId(int id) {
-    return database.personFavoriteDao.findFavoritesByPersonId(id);
+  Future<List<Favorite>> findFavoritesByPersonUsername(String username) {
+    return database.personFavoriteDao.findFavoritesByPersonUsername(username);
   }
 }

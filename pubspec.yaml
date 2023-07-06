@@ -23,12 +23,15 @@ dependencies:
   geolocator: ^9.0.2
   map_launcher: ^2.5.0+1
   geocoding: ^2.1.0
-
   floor: ^1.4.2
   sqflite: ^2.2.8+4
   provider: ^6.0.5
   flutter_expandable_fab: ^1.8.1
   qr_flutter: ^4.1.0
+  easy_settings: ^1.0.0
+  property_change_notifier: ^0.3.0
+  http: ^1.1.0
+
 
 dev_dependencies:
   flutter_test:
