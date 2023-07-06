@@ -12,8 +12,8 @@ import 'favorite.dart';
     onDelete: ForeignKeyAction.cascade,
   ),
   ForeignKey(
-    childColumns: ['userId'],
-    parentColumns: ['id'],
+    childColumns: ['username'],
+    parentColumns: ['username'],
     entity: Person,
     onUpdate: ForeignKeyAction.cascade,
     onDelete: ForeignKeyAction.cascade,
@@ -23,11 +23,11 @@ class Discount {
   @PrimaryKey()
   final String id;
   final String favoriteId;
-  final String userId;
+  final String username;
   final String description;
   final DateTime issued;
   final DateTime expires;
 
-  Discount(this.id, this.favoriteId, this.userId, this.description, this.issued,
-      this.expires);
+  Discount(this.id, this.favoriteId, this.username, this.description,
+      this.issued, this.expires);
 }
