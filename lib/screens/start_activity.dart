@@ -52,8 +52,7 @@ class StartActivity extends StatelessWidget {
             ],
           );
         }
-        final steps = snapshot.data as List<Steps>;
-        final dailySteps = steps.map((e) => e.value).sum();
+        final dailySteps = snapshot.data as int;
         return Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.spaceAround,

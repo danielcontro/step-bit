@@ -67,6 +67,8 @@ class _$AppDatabase extends AppDatabase {
 
   PersonFavoriteDao? _personFavoriteDaoInstance;
 
+  DiscountDao? _discountDaoInstance;
+
   Future<sqflite.Database> open(
     String path,
     List<Migration> migrations, [
@@ -93,7 +95,9 @@ class _$AppDatabase extends AppDatabase {
         await database.execute(
             'CREATE TABLE IF NOT EXISTS `Favorite` (`id` TEXT NOT NULL, `name` TEXT NOT NULL, `city` TEXT NOT NULL, `lat` REAL NOT NULL, `lng` REAL NOT NULL, `address` TEXT, `type` TEXT NOT NULL, PRIMARY KEY (`id`))');
         await database.execute(
-            'CREATE TABLE IF NOT EXISTS `PersonFavorite` (`personUsername` TEXT NOT NULL, `favoriteId` TEXT NOT NULL, FOREIGN KEY (`personUsername`) REFERENCES `Person` (`username`) ON UPDATE CASCADE ON DELETE CASCADE, FOREIGN KEY (`favoriteId`) REFERENCES `Favorite` (`id`) ON UPDATE CASCADE ON DELETE CASCADE, PRIMARY KEY (`favoriteId`))');
+            'CREATE TABLE IF NOT EXISTS `PersonFavorite` (`personUsername` TEXT NOT NULL, `favoriteId` TEXT NOT NULL, FOREIGN KEY (`personUsername`) REFERENCES `Person` (`username`) ON UPDATE CASCADE ON DELETE CASCADE, FOREIGN KEY (`favoriteId`) REFERENCES `Favorite` (`id`) ON UPDATE CASCADE ON DELETE CASCADE, PRIMARY KEY (`personUsername`, `favoriteId`))');
+        await database.execute(
+            'CREATE TABLE IF NOT EXISTS `Discounts` (`id` TEXT NOT NULL, `favoriteId` TEXT NOT NULL, `username` TEXT NOT NULL, `description` TEXT NOT NULL, `issued` INTEGER NOT NULL, `expires` INTEGER NOT NULL, FOREIGN KEY (`favoriteId`) REFERENCES `Favorite` (`id`) ON UPDATE CASCADE ON DELETE CASCADE, FOREIGN KEY (`username`) REFERENCES `Person` (`username`) ON UPDATE CASCADE ON DELETE CASCADE, PRIMARY KEY (`id`))');
 
         await callback?.onCreate?.call(database, version);
       },
@@ -115,6 +119,11 @@ class _$AppDatabase extends AppDatabase {
   PersonFavoriteDao get personFavoriteDao {
     return _personFavoriteDaoInstance ??=
         _$PersonFavoriteDao(database, changeListener);
+  }
+
+  @override
+  DiscountDao get discountDao {
+    return _discountDaoInstance ??= _$DiscountDao(database, changeListener);
   }
 }
 
@@ -210,6 +219,20 @@ class _$FavoriteDao extends FavoriteDao {
   }
 
   @override
+  Future<Favorite?> findFavoriteById(String id) async {
+    return _queryAdapter.query('SELECT * FROM Favorite WHERE id = ?1',
+        mapper: (Map<String, Object?> row) => Favorite(
+            row['id'] as String,
+            row['name'] as String,
+            row['city'] as String,
+            row['lat'] as double,
+            row['lng'] as double,
+            row['address'] as String?,
+            row['type'] as String),
+        arguments: [id]);
+  }
+
+  @override
   Future<void> insertFavorite(Favorite favorite) async {
     await _favoriteInsertionAdapter.insert(favorite, OnConflictStrategy.abort);
   }
@@ -250,6 +273,17 @@ class _$PersonFavoriteDao extends PersonFavoriteDao {
   }
 
   @override
+  Future<Favorite?> findFavoriteByUsernameAndFavoriteName(
+    String username,
+    String favoriteName,
+  ) async {
+    return _queryAdapter.query(
+        'SELECT Favorite.*     FROM PersonFavorite     INNER JOIN Favorite ON Favorite.id = PersonFavorite.favoriteId     WHERE personUsername = ?1 AND Favorite.name = ?2',
+        mapper: (Map<String, Object?> row) => Favorite(row['id'] as String, row['name'] as String, row['city'] as String, row['lat'] as double, row['lng'] as double, row['address'] as String?, row['type'] as String),
+        arguments: [username, favoriteName]);
+  }
+
+  @override
   Future<void> deletePersonFavoriteFromIds(
     String username,
     String favoriteId,
@@ -273,3 +307,89 @@ class _$PersonFavoriteDao extends PersonFavoriteDao {
         personFavorite, OnConflictStrategy.abort);
   }
 }
+
+class _$DiscountDao extends DiscountDao {
+  _$DiscountDao(
+    this.database,
+    this.changeListener,
+  )   : _queryAdapter = QueryAdapter(database),
+        _discountInsertionAdapter = InsertionAdapter(
+            database,
+            'Discounts',
+            (Discount item) => <String, Object?>{
+                  'id': item.id,
+                  'favoriteId': item.favoriteId,
+                  'username': item.username,
+                  'description': item.description,
+                  'issued': _dateTimeConverter.encode(item.issued),
+                  'expires': _dateTimeConverter.encode(item.expires)
+                }),
+        _discountDeletionAdapter = DeletionAdapter(
+            database,
+            'Discounts',
+            ['id'],
+            (Discount item) => <String, Object?>{
+                  'id': item.id,
+                  'favoriteId': item.favoriteId,
+                  'username': item.username,
+                  'description': item.description,
+                  'issued': _dateTimeConverter.encode(item.issued),
+                  'expires': _dateTimeConverter.encode(item.expires)
+                });
+
+  final sqflite.DatabaseExecutor database;
+
+  final StreamController<String> changeListener;
+
+  final QueryAdapter _queryAdapter;
+
+  final InsertionAdapter<Discount> _discountInsertionAdapter;
+
+  final DeletionAdapter<Discount> _discountDeletionAdapter;
+
+  @override
+  Future<Discount?> getDiscountFromUsernameAndFavoriteName(
+    String username,
+    String favoriteName,
+  ) async {
+    return _queryAdapter.query(
+        'SELECT Discounts.*     FROM Discounts     INNER JOIN Favorite ON Favorite.id = Discounts.favoriteId     WHERE Discounts.username = ?1 AND Favorite.name = ?2',
+        mapper: (Map<String, Object?> row) => Discount(row['id'] as String, row['favoriteId'] as String, row['username'] as String, row['description'] as String, _dateTimeConverter.decode(row['issued'] as int), _dateTimeConverter.decode(row['expires'] as int)),
+        arguments: [username, favoriteName]);
+  }
+
+  @override
+  Future<List<Discount>> findDiscountsByUsername(String username) async {
+    return _queryAdapter.queryList(
+        'SELECT *     FROM Discounts     WHERE username = ?1',
+        mapper: (Map<String, Object?> row) => Discount(
+            row['id'] as String,
+            row['favoriteId'] as String,
+            row['username'] as String,
+            row['description'] as String,
+            _dateTimeConverter.decode(row['issued'] as int),
+            _dateTimeConverter.decode(row['expires'] as int)),
+        arguments: [username]);
+  }
+
+  @override
+  Future<int?> numberOfEntriesFromFavoriteId(String favoriteId) async {
+    return _queryAdapter.query(
+        'SELECT COUNT(*)     FROM Discounts     WHERE favoriteId = ?1',
+        mapper: (Map<String, Object?> row) => row.values.first as int,
+        arguments: [favoriteId]);
+  }
+
+  @override
+  Future<void> insertDiscount(Discount discount) async {
+    await _discountInsertionAdapter.insert(discount, OnConflictStrategy.abort);
+  }
+
+  @override
+  Future<void> deleteDiscount(Discount discount) async {
+    await _discountDeletionAdapter.delete(discount);
+  }
+}
+
+// ignore_for_file: unused_element
+final _dateTimeConverter = DateTimeConverter();

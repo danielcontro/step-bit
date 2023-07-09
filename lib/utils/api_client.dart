@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:intl/intl.dart';
 import 'package:stepbit/utils/app_interceptor.dart';
+import 'package:stepbit/utils/extension_methods.dart';
 import 'package:stepbit/utils/token_manager.dart';
 import 'package:http/http.dart' as http;
 
@@ -41,7 +42,7 @@ class ApiClient {
     });
   }
 
-  static Future<List<Steps>?> getSteps(DateTime date) async {
+  static Future<int?> getSteps(DateTime date) async {
     var newFormat = DateFormat('y-MM-dd');
     final dateFormatted = newFormat.format(date);
     final patientUsername = await TokenManager.getUsername();
@@ -54,12 +55,13 @@ class ApiClient {
       }
       try {
         final data = value.data['data']['data'];
-        return data
+        List<Steps> steps = data
             .cast<Map<String, dynamic>>()
             .map<Steps>((json) => Steps.fromJson(dateFormatted, json))
             .toList();
+        return steps.map((e) => e.value).sum();
       } catch (e) {
-        return List.empty();
+        return 0;
       }
     });
   }

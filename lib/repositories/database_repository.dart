@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:stepbit/database/entities/discount.dart';
 import 'package:stepbit/database/entities/favorite.dart';
 import 'package:stepbit/database/entities/person_favorite.dart';
+import 'package:stepbit/utils/token_manager.dart';
 
 import '../database/database.dart';
 import '../database/entities/person.dart';
@@ -24,14 +26,23 @@ class DatabaseRepository extends ChangeNotifier {
         .deletePersonFavoriteFromIds(username, favorite.id);
 
     if ((await database.personFavoriteDao
-            .numberOfEntriesFromFavoriteId(favorite.id)) ==
-        0) {
+                .numberOfEntriesFromFavoriteId(favorite.id)) ==
+            0 &&
+        await database.discountDao.numberOfEntriesFromFavoriteId(favorite.id) ==
+            0) {
       await database.favoriteDao.deleteFavorite(favorite);
     }
     notifyListeners();
   }
 
   Future<void> addNewFavorite(
+    Favorite favorite,
+  ) async {
+    await database.favoriteDao.insertFavorite(favorite);
+    notifyListeners();
+  }
+
+  Future<void> addNewPersonFavorite(
     Favorite favorite,
     PersonFavorite personFavorite,
   ) async {
@@ -40,17 +51,47 @@ class DatabaseRepository extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<Favorite?> findFavoriteByName(String name) {
-    return database.favoriteDao.findFavoriteByName(name);
-  }
-
-  Future<bool?> isFavorite(String name) {
-    return database.favoriteDao
-        .findFavoriteByName(name)
-        .then((value) => value == null ? false : true);
+  Future<Favorite?> findFavoriteByName(String name) async {
+    return database.personFavoriteDao.findFavoriteByUsernameAndFavoriteName(
+        (await TokenManager.getUsername())!, name);
   }
 
   Future<List<Favorite>> findFavoritesByPersonUsername(String username) {
     return database.personFavoriteDao.findFavoritesByPersonUsername(username);
+  }
+
+  Future<Discount?> getDiscount(String username, String favoriteName) async {
+    final discount = await database.discountDao
+        .getDiscountFromUsernameAndFavoriteName(username, favoriteName);
+
+    if (discount == null) return null;
+    if (discount.isExpired()) {
+      await deleteDiscount(discount);
+      return null;
+    }
+    return discount;
+  }
+
+  Future<void> addNewDiscount(Discount discount) async {
+    await database.discountDao.insertDiscount(discount);
+    notifyListeners();
+  }
+
+  Future<void> deleteDiscount(Discount discount) async {
+    await database.discountDao.deleteDiscount(discount);
+    notifyListeners();
+    return;
+  }
+
+  Future<List<Discount>> findDiscountsByUsername(String username) async {
+    var discounts =
+        await database.discountDao.findDiscountsByUsername(username);
+    for (var discount in discounts) {
+      if (discount.isExpired()) {
+        discounts.remove(discount);
+        await deleteDiscount(discount);
+      }
+    }
+    return discounts;
   }
 }
