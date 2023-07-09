@@ -30,4 +30,8 @@ class Discount {
 
   Discount(this.id, this.favoriteId, this.username, this.description,
       this.issued, this.expires);
+
+  bool isExpired() {
+    return expires.isBefore(DateTime.now());
+  }
 }

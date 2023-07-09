@@ -1,16 +1,22 @@
+import 'package:easy_settings/easy_settings.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_expandable_fab/flutter_expandable_fab.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:map_launcher/map_launcher.dart';
+import 'package:property_change_notifier/property_change_notifier.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:stepbit/database/entities/favorite.dart';
 import 'package:stepbit/database/entities/person_favorite.dart';
 import 'package:stepbit/models/poi.dart';
+import 'package:stepbit/screens/settings.dart';
+import 'package:stepbit/utils/api_client.dart';
+import 'package:stepbit/utils/discount_api.dart';
 import 'package:stepbit/utils/extension_methods.dart';
 import 'package:stepbit/utils/token_manager.dart';
 import 'package:uuid/uuid.dart';
 
+import '../database/entities/discount.dart';
 import '../repositories/database_repository.dart';
 
 class ViewPOI extends StatelessWidget {
@@ -46,6 +52,11 @@ class ViewPOI extends StatelessWidget {
         }
       },
     );
+  }
+
+  Future<Discount?> _getDiscount(DatabaseRepository dbr) async {
+    final username = await TokenManager.getUsername();
+    return await dbr.getDiscount(username!, poi.getName());
   }
 
   @override
@@ -97,27 +108,52 @@ class ViewPOI extends StatelessWidget {
     );
 
     final bottomContent = Container(
-      width: MediaQuery.of(context).size.width,
-      padding: const EdgeInsets.all(40.0),
-      child: Center(
-          child: Container(
-        color: Colors.white,
-        child: QrImageView(
-          data: "test",
-          version: QrVersions.auto,
-          size: 200.0,
-        ),
-      )
-          //       FutureBuilder<Widget>(
-          //       future: ,
-          //         builder: (context, snapshot) {
-          //           FloatingActionButton(
-          //               child: const Text("Request Discount"),
-          //               onPressed: () => (eligibleForDiscount ? () : null));
-
-          //         }
-          ),
-    );
+        width: MediaQuery.of(context).size.width,
+        padding: const EdgeInsets.all(40.0),
+        child: Center(
+            child: DiscountAPI.canHaveDiscount(poi)
+                ? PropertyChangeProvider<SettingsPropertyChangedNotifier,
+                        String>(
+                    value: settingsPropertyChangedNotifier,
+                    child: PropertyChangeConsumer<
+                            SettingsPropertyChangedNotifier, String>(
+                        properties: const [dailyStepsGoalKey],
+                        builder: (p0, p1, p2) {
+                          return FutureBuilder<Discount?>(
+                              future: _getDiscount(
+                                  Provider.of<DatabaseRepository>(context,
+                                      listen: true)),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState !=
+                                    ConnectionState.done) {
+                                  return const CircularProgressIndicator();
+                                }
+                                var discount = snapshot.data;
+                                if (discount == null) {
+                                  return TextButton(
+                                    style: TextButton.styleFrom(
+                                      textStyle: const TextStyle(fontSize: 20),
+                                      backgroundColor: const Color.fromRGBO(
+                                          116, 138, 77, 0.89),
+                                      foregroundColor: Colors.white,
+                                    ),
+                                    child: const Text("Request Discount"),
+                                    onPressed: () => (_requestDiscount(
+                                        context,
+                                        Provider.of<DatabaseRepository>(context,
+                                            listen: false))),
+                                  );
+                                }
+                                return Container(
+                                    color: Colors.white,
+                                    child: QrImageView(
+                                      data: discount.description,
+                                      version: QrVersions.auto,
+                                      size: 200.0,
+                                    ));
+                              });
+                        }))
+                : null));
 
     return Scaffold(
       appBar: AppBar(
@@ -146,19 +182,16 @@ class ViewPOI extends StatelessWidget {
                   return const CircularProgressIndicator();
                 }
                 // data loaded:
-                var isFavorite = true;
                 final favorite = snapshot.data;
-                if (favorite == null) {
-                  isFavorite = false;
-                }
+                final isFavorite = (favorite == null) ? false : true;
                 return FloatingActionButton.small(
                   heroTag: null,
                   backgroundColor: Colors.lime,
                   child: isFavorite
-                      ? const Icon(Icons.favorite_border)
-                      : const Icon(Icons.favorite),
+                      ? const Icon(Icons.favorite)
+                      : const Icon(Icons.favorite_border),
                   onPressed: () => isFavorite
-                      ? _removeFavorite(context, favorite!)
+                      ? _removeFavorite(context, favorite)
                       : _addFavorite(context),
                 );
               }),
@@ -184,6 +217,63 @@ class ViewPOI extends StatelessWidget {
     );
   }
 
+  void _requestDiscount(BuildContext context, DatabaseRepository dbr) async {
+    final discountResponse = await DiscountAPI.isEligibleForDiscount(
+        dbr,
+        (await ApiClient.getSteps(
+                DateTime.now().subtract(const Duration(days: 1)))) ??
+            0,
+        getSettingsPropertyValue<int>(dailyStepsGoalKey));
+
+    if (discountResponse == DiscountResponse.incompleteGoal &&
+        context.mounted) {
+      ScaffoldMessenger.of(context)
+        ..removeCurrentSnackBar()
+        ..showSnackBar(
+          const SnackBar(
+              content:
+                  Text('Complete the daily goal for requesting discounts')),
+        );
+      return null;
+    }
+
+    if (discountResponse == DiscountResponse.dailyDiscountsLimit &&
+        context.mounted) {
+      ScaffoldMessenger.of(context)
+        ..removeCurrentSnackBar()
+        ..showSnackBar(
+          const SnackBar(content: Text('Daily limit reached')),
+        );
+      return null;
+    }
+
+    final id = const Uuid().v4();
+    if (context.mounted) {
+      final database = Provider.of<DatabaseRepository>(context, listen: false);
+
+      var favorite = await database.findFavoriteByName(poi.getName());
+      if (favorite == null) {
+        favorite = Favorite(
+            const Uuid().v4(),
+            poi.getName(),
+            await getCity() ?? "",
+            poi.position.latitude,
+            poi.position.longitude,
+            poi.getStreet() ?? "",
+            poi.getType());
+        await database.addNewFavorite(favorite);
+      }
+      database.addNewDiscount(Discount(
+          id,
+          favorite.id,
+          (await TokenManager.getUsername())!,
+          const Uuid().v4(),
+          DateTime.now(),
+          DateTime.now().add(const Duration(days: 7))));
+      return;
+    }
+  }
+
   void _addFavorite(BuildContext context) async {
     final city = await getCity();
     final id = const Uuid().v4();
@@ -194,7 +284,7 @@ class ViewPOI extends StatelessWidget {
       if (poiDB == null) {
         if (context.mounted) {
           await Provider.of<DatabaseRepository>(context, listen: false)
-              .addNewFavorite(
+              .addNewPersonFavorite(
                   Favorite(
                     id,
                     poi.getName(),

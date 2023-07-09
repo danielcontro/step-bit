@@ -5,7 +5,7 @@ import 'person.dart';
 
 @Entity(
   tableName: 'PersonFavorite',
-  primaryKeys: ['personId', 'favoriteId'],
+  primaryKeys: ['personUsername', 'favoriteId'],
   foreignKeys: [
     ForeignKey(
         childColumns: ['personUsername'],

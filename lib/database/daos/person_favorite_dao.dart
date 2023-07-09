@@ -13,6 +13,15 @@ abstract class PersonFavoriteDao {
   ''')
   Future<List<Favorite>> findFavoritesByPersonUsername(String username);
 
+  @Query('''
+    SELECT Favorite.*
+    FROM PersonFavorite
+    INNER JOIN Favorite ON Favorite.id = PersonFavorite.favoriteId
+    WHERE personUsername = :username AND Favorite.name = :favoriteName
+  ''')
+  Future<Favorite?> findFavoriteByUsernameAndFavoriteName(
+      String username, String favoriteName);
+
   @insert
   Future<void> insertPersonFavorite(PersonFavorite personFavorite);
 
