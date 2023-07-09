@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:stepbit/database/entities/discount.dart';
 import 'package:stepbit/database/entities/favorite.dart';
 import 'package:stepbit/repositories/database_repository.dart';
 import 'package:stepbit/utils/token_manager.dart';

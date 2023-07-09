@@ -3,12 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:stepbit/models/exercise.dart';
 import 'package:stepbit/utils/app_colors.dart';
-import 'package:stepbit/utils/extension_methods.dart';
 import 'package:stepbit/widgets/activity_card.dart';
 import 'package:stepbit/widgets/quantity_input.dart';
 import 'package:stepbit/widgets/user_greeting.dart';
 
-import '../models/steps.dart';
 import '../utils/api_client.dart';
 import '../widgets/loading.dart';
 import '../widgets/step_ring.dart';

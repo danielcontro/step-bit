@@ -191,7 +191,7 @@ class ViewPOI extends StatelessWidget {
                       ? const Icon(Icons.favorite)
                       : const Icon(Icons.favorite_border),
                   onPressed: () => isFavorite
-                      ? _removeFavorite(context, favorite!)
+                      ? _removeFavorite(context, favorite)
                       : _addFavorite(context),
                 );
               }),
@@ -218,12 +218,34 @@ class ViewPOI extends StatelessWidget {
   }
 
   void _requestDiscount(BuildContext context, DatabaseRepository dbr) async {
-    if (!(await DiscountAPI.isEligibleForDiscount(
+    final discountResponse = await DiscountAPI.isEligibleForDiscount(
         dbr,
         (await ApiClient.getSteps(
-                DateTime.now().subtract(const Duration(days: 2)))) ??
+                DateTime.now().subtract(const Duration(days: 1)))) ??
             0,
-        getSettingsPropertyValue<int>(dailyStepsGoalKey)))) return null;
+        getSettingsPropertyValue<int>(dailyStepsGoalKey));
+
+    if (discountResponse == DiscountResponse.incompleteGoal &&
+        context.mounted) {
+      ScaffoldMessenger.of(context)
+        ..removeCurrentSnackBar()
+        ..showSnackBar(
+          const SnackBar(
+              content:
+                  Text('Complete the daily goal for requesting discounts')),
+        );
+      return null;
+    }
+
+    if (discountResponse == DiscountResponse.dailyDiscountsLimit &&
+        context.mounted) {
+      ScaffoldMessenger.of(context)
+        ..removeCurrentSnackBar()
+        ..showSnackBar(
+          const SnackBar(content: Text('Daily limit reached')),
+        );
+      return null;
+    }
 
     final id = const Uuid().v4();
     if (context.mounted) {

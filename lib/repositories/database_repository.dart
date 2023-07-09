@@ -86,11 +86,16 @@ class DatabaseRepository extends ChangeNotifier {
   Future<List<Discount>> findDiscountsByUsername(String username) async {
     var discounts =
         await database.discountDao.findDiscountsByUsername(username);
-    for (var discount in discounts) {
-      if (discount.isExpired()) {
-        discounts.remove(discount);
-        await deleteDiscount(discount);
-      }
+
+    final discountsToRemove =
+        discounts.fold<List<Discount>>([], (previousValue, element) {
+      if (element.isExpired()) previousValue.add(element);
+      return previousValue;
+    });
+
+    for (var discount in discountsToRemove) {
+      discounts.remove(discount);
+      await deleteDiscount(discount);
     }
     return discounts;
   }
